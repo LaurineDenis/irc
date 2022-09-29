@@ -132,10 +132,10 @@ void	Server::run(Server *server)
 				std::cout << server->_clientAmount << std::endl;
 				for (int j = 1; j < server->_clientAmount; j++)
 				{
-					if (i > 0 && server->_users->at(j - 1).answer != "")
+					if (server->_users->at(j - 1).answer != "")
 					{
 						std::string answer = server->_users->at(j - 1).answer + ENDLINE;
-						std::cout << answer.c_str() << std::endl;
+						std::cout << "Send to client ==== " << answer.c_str() << std::endl;
 						send(server->_clientFd.at(j), answer.c_str(), answer.length(), 0);
 						server->_users->at(j - 1).answer = "";
 					}

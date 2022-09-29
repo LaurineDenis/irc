@@ -36,7 +36,7 @@ class Command
 	void	command_kick(std::vector<std::string> out, User *user, Server *server);
 	void	command_quit(std::vector<std::string> out, User *user, Server *server);
 	void	change_topic(std::string topic, std::string user, Channel *channel);
-	void	send_msg_to_channel_users(std::string msg, User *user, Channel *channel);
+	void	send_msg_to_channel_users(std::string msg, User *user, Channel *channel, Server *server);
 
 };
 
