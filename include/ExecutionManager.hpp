@@ -3,6 +3,24 @@
 
 # include "Irc.hpp"
 
+class	User;
+class	Channel;
+class	Server;
+
+enum	Command_lst
+{
+	NICK,
+	USER,
+	CAP,
+	JOIN,
+	PRIVMSG,
+	PART,
+	TOPIC,
+	KICK,
+	PING,
+	QUIT
+};
+
 class	ExecutionManager {
 
 	public:
@@ -28,14 +46,32 @@ class	ExecutionManager {
 		void		newConnection();
 		void		deleteUser(int i); 
 		void		sendRpl();
-		void		dispatchCmd();
+		void		dispatchCmd(User *user, std::string buffer);
 		void		IO_Operation();
 		std::string		recvCmd(int i);
+		void	command_cap(std::vector<std::string> out);
+		void	command_ping(std::vector<std::string> out);
+		void	command_nick(std::vector<std::string> out, User *user);
+		void	command_user(std::vector<std::string> out, User *user);
+		void	command_join(std::vector<std::string> out, User *user);
+		void	command_privmsg(std::vector<std::string> out, User *user);
+		void	command_part(std::vector<std::string> out, User *user);
+		void	command_topic(std::vector<std::string> out, User *user);
+		void	command_kick(std::vector<std::string> out, User *user);
+		void	command_quit(std::vector<std::string> out, User *user);
+		void	change_topic(std::string topic, std::string user, Channel *channel);
+		void	send_msg_to_channel_users(std::string msg, User *user, Channel *channel);
+		void	print_infos();
+		Channel	*find_channel(std::string channel_name);
+		void	delete_channel(Channel *channel);
+		bool	check_nickname(std::string nickname);
+		void	remove_user_of_channel(Channel *channel, User *user);
+
 
 	private:
 
-		std::vector<Channel>		_channels;
-		std::vector<User>			_users;
+		std::vector<Channel>		*_channels;
+		std::vector<User>			*_users;
 		std::vector<struct pollfd>	_clientSd;
 		std::vector<int>			_clientFd;
 		std::string					_password;

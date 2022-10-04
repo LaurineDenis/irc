@@ -23,32 +23,32 @@ void	Server::init(int ac, char **av)
 
 void		Server::start(ExecutionManager *exec)
 {
-	int					socket;
+	int					sockets;
 	int					opt = 1;
 	struct sockaddr_in	addr = {AF_INET, INADDR_ANY, htons(this->_port)};
 
-	if ((socket = socket(PF_INET, SOCK_STREAM, 0)) < 0)
+	if ((sockets = socket(PF_INET, SOCK_STREAM, 0)) < 0)
 	{
 		std::cerr << "socket failed" << std::endl;
 		exit(EXIT_FAILURE);
 	}
-	if (setsockopt(socket, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof opt))
+	if (setsockopt(sockets, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof opt))
 	{
 		std::cerr << "setsockopt failed" << std::endl;
 		exit(EXIT_FAILURE);
 	}
-	if (bind(socket, reinterpret_cast<struct sockaddr *>(&addr), sizeof(addr)) < 0)
+	if (bind(sockets, reinterpret_cast<struct sockaddr *>(&addr), sizeof(addr)) < 0)
 	{
 		std::cerr << "bind failed" << std::endl;
 		exit(EXIT_FAILURE);
 	}
-	if (listen(socket, 50) < 0)
+	if (listen(sockets, 50) < 0)
 	{
 		std::cerr << "listen failed" << std::endl;
 		exit(EXIT_FAILURE);
 	}
 	exec->setAddrlen(sizeof(addr));
-	this->_socket = socket;
+	this->_socket = sockets;
 	std::cout << "Waiting for connections ... " << std::endl;
 }
 

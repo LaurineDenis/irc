@@ -3,8 +3,7 @@
 
 # include "Irc.hpp"
 
-class	User;
-class	Channel;
+class	ExecutionManager;
 
 class	Server {
 

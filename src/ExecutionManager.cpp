@@ -15,7 +15,7 @@ void	ExecutionManager::newUser(int newSocket)
 
 	this->_clientAmount++;
 	fcntl(newSocket, F_SETFL, O_NONBLOCK);
-	this->_users.push_back(*user);
+	this->_users->push_back(*user);
 	this->addSd(newSocket, POLLIN);
 }
 
@@ -56,13 +56,74 @@ void		ExecutionManager::newConnection()
 void		ExecutionManager::deleteUser(int i)
 {
 	/* supprimer user des channels */
-	this->_users.erase(this->_users.cbegin() + i);
+	this->_users->erase(this->_users->cbegin() + i);
 	/* close connection? */
 }
 
-void		ExecutionManager::dispatchCmd()
+void		ExecutionManager::dispatchCmd(User *user, std::string buffer)
 {
-	/* dispatch command from command.cpp with some small changes */
+	std::vector<std::string>	out;
+	std::string					cmd_name[10] = {"NICK", "USER", "CAP", "JOIN", "PRIVMSG", "PART", "TOPIC", "KICK", "PING", "QUIT"};
+	int							i;
+	// ExecutionManager			manager;
+
+	out = split_vector(buffer, " \r\n");
+	/* print_infos(server); */
+	std::cout << "User cmd : " << user->get_nickname() << std::endl;
+	std::cout << "Commande Split :" << std::endl;
+	for (std::vector<std::string>::iterator it = out.begin(); it != out.end(); ++it)
+		std::cout << "|" << *it << "|" << std::endl;
+	for (i = 0; i < 10; i++)
+	{
+		if (cmd_name[i] == out[0])
+			break ;
+	}
+	switch (i)
+	{
+		case CAP :
+			std::cout << "Cap switch" << std::endl;
+			command_cap(out);
+			break;
+		case PING :
+			std::cout << "Ping switch" << std::endl;
+			command_ping(out);
+			break;
+		case NICK :
+			std::cout << "Nick switch" << std::endl;
+			command_nick(out, user);
+			break;
+		case USER :
+			std::cout << "User switch" << std::endl;
+			command_user(out, user);
+			break;
+		case JOIN :
+			std::cout << "Join switch" << std::endl;
+			command_join(out, user);
+			break;
+		case PRIVMSG :
+			std::cout << "Privmsg switch" << std::endl;
+			command_privmsg(out, user);
+			break;
+		case PART :
+			std::cout << "Part switch" << std::endl;
+			command_part(out, user);
+			break;
+		case TOPIC :
+			std::cout << "Topic switch" << std::endl;
+			command_topic(out, user);
+			break;
+		case KICK :
+			std::cout << "Kick switch" << std::endl;
+			command_kick(out, user);
+			break;
+		case QUIT :
+			std::cout << "Quit switch" << std::endl;
+			command_quit(out, user);
+			break;
+		default :
+			std::cout << "Unknow command" << std::endl;
+	}
+	// print_infos(server);
 }
 
 void		ExecutionManager::sendRpl()
@@ -71,9 +132,9 @@ void		ExecutionManager::sendRpl()
 
 	for (int i = 1; i < this->_clientSd.size(); i++)
 	{
-		if (this->_users.at(i - 1)._answer.length())
+		if (this->_users->at(i - 1).answer.length())
 		{
-			answer = this->_users.at(i - 1)._answer + ENDLINE;
+			answer = this->_users->at(i - 1).answer + ENDLINE;
 			std::cout << answer.c_str() << std::endl;
 			send(this->_clientFd.at(i), answer.c_str(), answer.length(), 0);
 		}
@@ -86,8 +147,8 @@ std::string		ExecutionManager::recvCmd(int i)
 	ssize_t			ret;
 
 	while (cmd.find("\n\r", 0) == std::string::npos)
-		recv(this->_clientSd.at(i).fd, cmd.c_str() + cmd.length(), cmd.length(), 0);
-	return cmd;
+		recv(this->_clientSd.at(i).fd, (void *)(cmd.c_str() + cmd.length()), cmd.length(), 0);
+	return (cmd);
 }
 
 void		ExecutionManager::IO_Operation()
@@ -105,7 +166,7 @@ void		ExecutionManager::IO_Operation()
 		}
 		else
 		{
-			this->dispatchCmd();
+			this->dispatchCmd(&this->_users->at(i), cmd);
 			this->sendRpl();
 		}
 	}

@@ -1,6 +1,6 @@
 #include "../include/Server.hpp"
 
-void	Command::change_topic(std::string topic, std::string user, Channel *channel)
+void	ExecutionManager::change_topic(std::string topic, std::string user, Channel *channel)
 {
 	// char			time_test[300];
 	time_t timestamp = time( NULL );
@@ -12,7 +12,7 @@ void	Command::change_topic(std::string topic, std::string user, Channel *channel
 	channel->set_topic_time(ctime(&timestamp));
 }
 
-void	Command::command_topic(std::vector<std::string> out, User *user, Server *server)
+void	ExecutionManager::command_topic(std::vector<std::string> out, User *user)
 {
 	std::cout << "command TOPIC" << std::endl;
 	Channel		*channel;
@@ -21,7 +21,7 @@ void	Command::command_topic(std::vector<std::string> out, User *user, Server *se
 	if (out[1][0] == '#')
 	{
 		channel_name = out[1].erase(0, 1);
-		if ((channel = find_channel(server, channel_name)) == NULL)
+		if ((channel = find_channel(channel_name)) == NULL)
 			user->answer = out[1] + " No such channel" + ENDLINE;
 		else
 		{
@@ -48,7 +48,7 @@ void	Command::command_topic(std::vector<std::string> out, User *user, Server *se
 	}
 }
 
-void	Command::command_join(std::vector<std::string> out, User *user, Server *server)
+void	ExecutionManager::command_join(std::vector<std::string> out, User *user)
 {
 	std::cout << "command Join" << std::endl;
 	Channel		*channel;
@@ -61,13 +61,13 @@ void	Command::command_join(std::vector<std::string> out, User *user, Server *ser
 	{
 		std::cout << "channel join = " << out[i] << std::endl;
 		channel_name = out[i].erase(0, 1);
-		if ((channel = find_channel(server, channel_name)) == NULL)
+		if ((channel = find_channel(channel_name)) == NULL)
 		{
 			//creer le channel si il existe pas correspondant
 			channel = new Channel(user, channel_name);
 			//add channel in server
 			std::cout << "push back name = " << channel->get_name() << std::endl;
-			server->_channels->push_back(*channel);
+			_channels->push_back(*channel);
 		}
 		add_channel_in_user(channel, user);
 		user->answer += ":" + user->get_nickname() + "!" + user->get_nickname() + "@server JOIN #" + channel->get_name() + ENDLINE;
@@ -85,7 +85,7 @@ void	Command::command_join(std::vector<std::string> out, User *user, Server *ser
 			}
 			user->answer += ":server 353 " +  user->get_name() + " = #" + channel->get_name() + " :" + msg + ENDLINE;
 		}
-		send_msg_to_channel_users(":" + user->get_nickname() + "!" + user->get_nickname() + "@server JOIN #" + channel->get_name() + ENDLINE, user, channel, server);
+		send_msg_to_channel_users(":" + user->get_nickname() + "!" + user->get_nickname() + "@server JOIN #" + channel->get_name() + ENDLINE, user, channel);
 		i++;
 	}
 	if (i != out.size())
@@ -115,19 +115,19 @@ void	add_channel_in_user(Channel *channel, User *user)
 		channel->_users->push_back(*user);
 }
 
-void	delete_channel(Channel *channel, Server *server)
+void	ExecutionManager::delete_channel(Channel *channel)
 {
-	for (size_t i = 0; i < server->_channels->size(); i++)
+	for (size_t i = 0; i < _channels->size(); i++)
 	{
-		if (channel->get_name() == server->_channels->at(i).get_name())
+		if (channel->get_name() == _channels->at(i).get_name())
 		{
-			server->_channels->erase(server->_channels->begin() + i);
+			_channels->erase(_channels->begin() + i);
 			break ;
 		}
 	}
 }
 
-void	remove_user_of_channel(Channel *channel, User *user, Server *server)
+void	ExecutionManager::remove_user_of_channel(Channel *channel, User *user)
 {
 	int		i = 0;
 	//supprimer le channel dans user
@@ -143,10 +143,10 @@ void	remove_user_of_channel(Channel *channel, User *user, Server *server)
 	channel->_users->erase(channel->_users->begin() + i);
 	//supprimer le channel si 0 users
 	if (channel->_users->empty())
-		delete_channel(channel, server);
+		delete_channel(channel);
 }
 
-void	Command::command_part(std::vector<std::string> out, User *user, Server *server)
+void	ExecutionManager::command_part(std::vector<std::string> out, User *user)
 {
 	std::cout << "command Part" << std::endl;
 	Channel		*channel;
@@ -155,7 +155,7 @@ void	Command::command_part(std::vector<std::string> out, User *user, Server *ser
 	if (out[1][0] == '#')
 	{
 		channel_name = out[1].erase(0, 1);
-		if ((channel = find_channel(server, channel_name)) == NULL)
+		if ((channel = find_channel(channel_name)) == NULL)
 		{
 			//Le channel n'existe pas => Pas de message d'erreurs ?
 			std::cout << "No Channel found" << std::endl;
@@ -164,10 +164,10 @@ void	Command::command_part(std::vector<std::string> out, User *user, Server *ser
 		else
 		{
 			//quit le channel qui existe deja
-			remove_user_of_channel(channel, user, server);
+			remove_user_of_channel(channel, user);
 			user->answer = ":" + user->get_nickname() + "!" + user->get_name() + "@server PART #" + channel->get_name() + ENDLINE;
 			std::cout << "send = " << user->answer << std::endl;
-			send_msg_to_channel_users(":" + user->get_nickname() + "!" + user->get_nickname() + "@server PART #" + channel->get_name() + ENDLINE, user, channel, server);
+			send_msg_to_channel_users(":" + user->get_nickname() + "!" + user->get_nickname() + "@server PART #" + channel->get_name() + ENDLINE, user, channel);
 		}
 	}
 	else
@@ -176,7 +176,7 @@ void	Command::command_part(std::vector<std::string> out, User *user, Server *ser
 	}
 }
 
-void	Command::command_kick(std::vector<std::string> out, User *user, Server *server)
+void	ExecutionManager::command_kick(std::vector<std::string> out, User *user)
 {
 	std::cout << "command Kick" << std::endl;
 	Channel		*channel;
@@ -186,7 +186,7 @@ void	Command::command_kick(std::vector<std::string> out, User *user, Server *ser
 	if (out[1][0] == '#')
 	{
 		channel_name = out[1].erase(0, 1);
-		if ((channel = find_channel(server, channel_name)) == NULL)
+		if ((channel = find_channel(channel_name)) == NULL)
 		{
 			//Le channel n'existe pas => Pas de message d'erreurs ?
 			std::cout << "No Channel found" << std::endl;
