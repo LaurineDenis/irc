@@ -26,6 +26,7 @@ Channel						*find_channel(Server *server, std::string channel_name);
 void						add_channel_in_user(Channel *channel, User *user);
 bool						check_nickname(std::string nickname, Server *server);
 void						print_infos(Server *server);
+bool	                    is_in_channel(Channel *channel, User *user);
 
 # define TRUE	1
 # define FALSE	0
