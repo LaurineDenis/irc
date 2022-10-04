@@ -106,7 +106,9 @@ bool	is_in_channel(Channel *channel, User *user)
 void	add_channel_in_user(Channel *channel, User *user)
 {
 	//add channel in user
-	std::cout << user->get_nickname() << std::endl;
+	std::cout << "Add channel in user" << std::endl;
+	std::cout << "User : " << user->get_nickname() << std::endl;
+	std::cout << "Channel : " << channel->get_name() << std::endl;
 	user->_channels->push_back(*channel);
 	user->set_nb_channel(user->get_nb_channel() + 1);
 	if (is_in_channel(channel, user) == false)
@@ -165,6 +167,7 @@ void	Command::command_part(std::vector<std::string> out, User *user, Server *ser
 			remove_user_of_channel(channel, user, server);
 			user->answer = ":" + user->get_nickname() + "!" + user->get_name() + "@server PART #" + channel->get_name() + ENDLINE;
 			std::cout << "send = " << user->answer << std::endl;
+			send_msg_to_channel_users(":" + user->get_nickname() + "!" + user->get_nickname() + "@server PART #" + channel->get_name() + ENDLINE, user, channel, server);
 		}
 	}
 	else

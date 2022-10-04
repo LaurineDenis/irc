@@ -128,6 +128,7 @@ void	Server::run(Server *server)
 					buffer[valread] = 0;
 					std::cout << "Client " << server->_clientFd.at(i) << " sent:" << buffer << std::endl;
 					dispatch_cmd(buffer, server, &server->_users->at(i - 1));
+					print_infos(server);
 				}
 				std::cout << server->_clientAmount << std::endl;
 				for (int j = 1; j < server->_clientAmount; j++)

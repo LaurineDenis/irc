@@ -63,7 +63,7 @@ void	dispatch_cmd(std::string buffer, Server *server, User *user)
 		default :
 			std::cout << "Unknow command" << std::endl;
 	}
-	print_infos(server);
+	// print_infos(server);
 }
 
 Command::Command(void)
