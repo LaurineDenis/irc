@@ -66,7 +66,9 @@ void	Server::run(ExecutionManager *exec)
 			exit(EXIT_FAILURE);
 		}
 		else if (events == 1)
+		{
 			exec->newConnection();
+		}
 		else
 			exec->IO_Operation();
 	}

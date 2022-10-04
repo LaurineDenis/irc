@@ -1,6 +1,8 @@
 #include "../include/Irc.hpp"
+#include <cstring>
 #include <sys/poll.h>
 #include <sys/socket.h>
+#include <type_traits>
 
 void	ExecutionManager::addSd(int socket, short events)
 {
@@ -34,7 +36,7 @@ int			ExecutionManager::checkPoll()
 	ret = poll(this->_clientSd.data(), this->_clientSd.size(), -1);
 	if (ret > 0)
 	{
-		if (this->_clientSd.at(0).events)
+		if (this->_clientSd.at(0).revents & POLLIN)
 			return 1;
 		else
 			return 2;
@@ -51,6 +53,7 @@ void		ExecutionManager::newConnection()
 	std::cout << "New Connection: " << newSocket << std::endl;
 	this->newUser(newSocket);
 	this->_clientSd.at(0).revents = 0;
+	this->_clientSd.at(this->_clientSd.size() - 1).revents = POLLIN;
 }
 
 void		ExecutionManager::deleteUser(int i)
@@ -123,7 +126,6 @@ void		ExecutionManager::dispatchCmd(User *user, std::string buffer)
 		default :
 			std::cout << "Unknow command" << std::endl;
 	}
-	// print_infos(server);
 }
 
 void		ExecutionManager::sendRpl()
@@ -135,8 +137,9 @@ void		ExecutionManager::sendRpl()
 		if (this->_users->at(i - 1).answer.length())
 		{
 			answer = this->_users->at(i - 1).answer + ENDLINE;
-			std::cout << answer.c_str() << std::endl;
-			send(this->_clientFd.at(i), answer.c_str(), answer.length(), 0);
+			std::cout <<  "Reply sent: " << answer.c_str() << std::endl;
+			send(this->_clientSd.at(i).fd, answer.c_str(), answer.length(), 0);
+			this->_users->at(i - 1).answer = "";
 		}
 	}
 }
@@ -144,10 +147,16 @@ void		ExecutionManager::sendRpl()
 std::string		ExecutionManager::recvCmd(int i)
 {
 	std::string		cmd;
-	ssize_t			ret;
+	ssize_t			ret = 1;
+	char			buffer[4096];
 
-	while (cmd.find("\n\r", 0) == std::string::npos)
-		recv(this->_clientSd.at(i).fd, (void *)(cmd.c_str() + cmd.length()), cmd.length(), 0);
+	while (cmd.find(ENDLINE, 0) == std::string::npos && ret > 0)
+	{
+		ret += recv(this->_clientSd.at(i).fd, buffer, sizeof(buffer), 0);
+		buffer[ret] = 0;
+		cmd = buffer;
+	}
+	this->_clientSd.at(i).revents = 0;
 	return (cmd);
 }
 
@@ -158,6 +167,7 @@ void		ExecutionManager::IO_Operation()
 
 	for (int i = 1; i < this->_clientSd.size(); i++)
 	{
+		cmd = "";
 		cmd = recvCmd(i);
 		if (!cmd.size() && this->_clientSd.at(i).events & POLLHUP)
 		{
@@ -166,7 +176,8 @@ void		ExecutionManager::IO_Operation()
 		}
 		else
 		{
-			this->dispatchCmd(&this->_users->at(i), cmd);
+			if (cmd.length())
+				this->dispatchCmd(&this->_users->at(i - 1), cmd);
 			this->sendRpl();
 		}
 	}

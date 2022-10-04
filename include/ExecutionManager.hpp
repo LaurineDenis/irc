@@ -32,7 +32,7 @@ class	ExecutionManager {
 
 		/* SETTER */
 
-		int							setAddrlen(int len) {this->_addrlen = len;};
+		void							setAddrlen(int len) {this->_addrlen = len;};
 
 		/* GETTER */
 
