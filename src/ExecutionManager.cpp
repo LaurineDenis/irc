@@ -101,7 +101,7 @@ void		ExecutionManager::dispatchCmd(User *user, std::string buffer)
 			break;
 		case JOIN :
 			std::cout << "Join switch" << std::endl;
-			command_join(out, user);
+			command_join(out, user, buffer);
 			break;
 		case PRIVMSG :
 			std::cout << "Privmsg switch" << std::endl;

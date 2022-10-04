@@ -48,47 +48,63 @@ void	ExecutionManager::command_topic(std::vector<std::string> out, User *user)
 	}
 }
 
-void	ExecutionManager::command_join(std::vector<std::string> out, User *user)
+
+void	ExecutionManager::command_join(std::vector<std::string> out, User *user, std::string str)
 {
 	std::cout << "command Join" << std::endl;
-	Channel		*channel;
-	std::string	channel_name;
-	int			i = 1;
-	std::string	msg = "";
+	Channel						*channel;
+	std::string					channel_name;
+	std::vector<std::string>	split_comma;
+	int							i = 1;
+	std::string					msg = "";
 
-	std::cout << out.size() << std::endl;
-	while (i < out.size() && out[i][0] =='#')
+	// std::cout << out.size() << std::endl;
+	str.erase(0,5);
+	split_comma = split_vector(str, "\r\n,");
+	while (i < split_comma.size())
 	{
-		std::cout << "channel join = " << out[i] << std::endl;
-		channel_name = out[i].erase(0, 1);
-		if ((channel = find_channel(channel_name)) == NULL)
+		if (split_comma[i][0] != '#')
 		{
-			//creer le channel si il existe pas correspondant
-			channel = new Channel(user, channel_name);
-			//add channel in server
-			std::cout << "push back name = " << channel->get_name() << std::endl;
-			_channels->push_back(*channel);
+			std::cout << "# OU PAS " << split_comma[i][0] << std::endl;
+			user->answer += split_comma[i] + " No such channel" + ENDLINE;
+			i++;
 		}
-		add_channel_in_user(channel, user);
-		user->answer += ":" + user->get_nickname() + "!" + user->get_nickname() + "@server JOIN #" + channel->get_name() + ENDLINE;
-		if (channel->get_topic() != "")
-			user->answer += ":server 332 " +  user->get_name() + " #" + channel->get_name() + " :" + channel->get_topic() + ENDLINE + ":server 333 " +  user->get_name() + " #" + channel->get_name() + " " + channel->get_topic_user() + " " + channel->get_topic_time() + ENDLINE;
-		if (channel->_users->size() > 1)
+		else
 		{
-			for (int i = 0; i < channel->_users->size(); i++)
+			//sortir boucle si espace pas voulu
+			if (split_comma[i - 1][split_comma[i - 1].size() - 1] == ' ')
+				break;
+			std::cout << "channel join = " << split_comma[i] << std::endl;
+			channel_name = split_comma[i].erase(0, 1);
+			if ((channel = find_channel(channel_name)) == NULL)
 			{
-				if (i != 0)
-					msg += " ";
-				if (channel->_users->at(i).get_nickname() == channel->get_operator()->get_nickname())
-					msg+= "@";
-				msg += channel->_users->at(i).get_nickname();
+				//creer le channel si il existe pas correspondant
+				channel = new Channel(user, channel_name);
+				//add channel in server
+				std::cout << "push back name = " << channel->get_name() << std::endl;
+				_channels->push_back(*channel);
 			}
-			user->answer += ":server 353 " +  user->get_name() + " = #" + channel->get_name() + " :" + msg + ENDLINE;
+			add_channel_in_user(channel, user);
+			user->answer += ":" + user->get_nickname() + "!" + user->get_nickname() + "@server JOIN #" + channel->get_name() + ENDLINE;
+			if (channel->get_topic() != "")
+				user->answer += ":server 332 " +  user->get_name() + " #" + channel->get_name() + " :" + channel->get_topic() + ENDLINE + ":server 333 " +  user->get_name() + " #" + channel->get_name() + " " + channel->get_topic_user() + " " + channel->get_topic_time() + ENDLINE;
+			if (channel->_users->size() > 1)
+			{
+				for (int i = 0; i < channel->_users->size(); i++)
+				{
+					if (i != 0)
+						msg += " ";
+					if (channel->_users->at(i).get_nickname() == channel->get_operator()->get_nickname())
+						msg+= "@";
+					msg += channel->_users->at(i).get_nickname();
+				}
+				user->answer += ":server 353 " +  user->get_name() + " = #" + channel->get_name() + " :" + msg + ENDLINE;
+			}
+			send_msg_to_channel_users(":" + user->get_nickname() + "!" + user->get_nickname() + "@server JOIN #" + channel->get_name() + ENDLINE, user, channel);
+			i++;
 		}
-		send_msg_to_channel_users(":" + user->get_nickname() + "!" + user->get_nickname() + "@server JOIN #" + channel->get_name() + ENDLINE, user, channel);
-		i++;
 	}
-	if (i != out.size())
+	if (i != split_comma.size())
 	{
 		user->answer = out[i - 1] + " No such channel" + ENDLINE;
 	}
