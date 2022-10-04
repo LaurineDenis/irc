@@ -148,7 +148,7 @@ std::string		ExecutionManager::recvCmd(int i)
 {
 	std::string		cmd;
 	ssize_t			ret = 1;
-	char			buffer[4096];
+	char			buffer[4096] = {0};
 
 	while (cmd.find(ENDLINE, 0) == std::string::npos && ret > 0)
 	{
