@@ -6,6 +6,7 @@ void	ExecutionManager::change_topic(std::string topic, std::string user, Channel
 	time_t timestamp = time( NULL );
     // struct tm * pTime = localtime( & timestamp );
 	// strftime(time_test, 300, "%a, %d %h %G %T", pTime);
+	//test
 	// std::string		time_string;
 	channel->set_topic(topic);
 	channel->set_topic_user(user);
