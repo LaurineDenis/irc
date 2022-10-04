@@ -2,9 +2,11 @@
 
 int main(int ac, char **av)
 {
-	Server	*server = new Server();
+	Server				*server = new Server();
+	ExecutionManager	*exec = new ExecutionManager();
 
-	server->initServer(server, ac, av);
-	server->startServer(server);
-	server->run(server);
+	server->init(ac, av);
+	server->start(exec);
+	exec->init(server);
+	server->run(exec);
 }
