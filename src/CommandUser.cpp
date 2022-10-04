@@ -51,8 +51,3 @@ void	Command::command_user(std::vector<std::string> out, Server *server, User *u
 		user->wlcm_send = 1;
 	}
 }
-
-void	Command::command_quit(std::vector<std::string> out, User *user, Server *server)
-{
-	std::cout << "command Quit" << std::endl;
-}

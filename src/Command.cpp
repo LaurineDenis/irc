@@ -1,4 +1,4 @@
-#include "../include/Server.hpp"
+include "../include/Server.hpp"
 
 void	dispatch_cmd(std::string buffer, Server *server, User *user)
 {
@@ -58,7 +58,7 @@ void	dispatch_cmd(std::string buffer, Server *server, User *user)
 			break;
 		case QUIT :
 			std::cout << "Quit switch" << std::endl;
-			command.command_quit(out, user, server);
+			server.command_quit(out, user, server);
 			break;
 		default :
 			std::cout << "Unknow command" << std::endl;

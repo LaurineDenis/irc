@@ -16,6 +16,7 @@
 # include "Command.hpp"
 # include "Message.hpp"
 # include "User.hpp"
+# include "ExecutionManager.hpp"
 
 #define ENDLINE "\r\n"
 
