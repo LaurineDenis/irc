@@ -66,7 +66,7 @@ void		ExecutionManager::deleteUser(int i)
 void		ExecutionManager::dispatchCmd(User *user, std::string buffer)
 {
 	std::vector<std::string>	out;
-	std::string					cmd_name[10] = {"NICK", "USER", "CAP", "JOIN", "PRIVMSG", "PART", "TOPIC", "KICK", "PING", "QUIT"};
+	std::string					cmd_name[11] = {"NICK", "USER", "CAP", "JOIN", "PRIVMSG", "PART", "TOPIC", "KICK", "PING", "QUIT", "NOTICE"};
 	int							i;
 	// ExecutionManager			manager;
 
@@ -76,7 +76,7 @@ void		ExecutionManager::dispatchCmd(User *user, std::string buffer)
 	std::cout << "Commande Split :" << std::endl;
 	for (std::vector<std::string>::iterator it = out.begin(); it != out.end(); ++it)
 		std::cout << "|" << *it << "|" << std::endl;
-	for (i = 0; i < 10; i++)
+	for (i = 0; i < 11; i++)
 	{
 		if (cmd_name[i] == out[0])
 			break ;
@@ -122,6 +122,10 @@ void		ExecutionManager::dispatchCmd(User *user, std::string buffer)
 		case QUIT :
 			std::cout << "Quit switch" << std::endl;
 			command_quit(out, user);
+			break;
+		case NOTICE :
+			std::cout << "Quit switch" << std::endl;
+			command_notice(out, user);
 			break;
 		default :
 			std::cout << "Unknow command" << std::endl;

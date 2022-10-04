@@ -24,6 +24,7 @@ std::vector<std::string>	split_vector(std::string s, std::string delimiter);
 void						add_channel_in_user(Channel *channel, User *user);
 bool						is_in_channel(Channel *channel, User *user);
 
+
 # define TRUE	1
 # define FALSE	0
 

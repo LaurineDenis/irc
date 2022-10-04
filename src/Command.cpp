@@ -65,7 +65,7 @@ void	ExecutionManager::command_privmsg(std::vector<std::string> out, User *user)
 	if (out[1][0] == '#')
 	{
 		channel_name = out[1].erase(0, 1);
-		if ((channel = find_channel(channel_name)) == NULL)
+		if ((channel = find_channel(channel_name)) == NULL || is_in_channel(channel, user) == false)
 		{
 			//Le channel n'existe pas
 			user->answer = out[1] + " No such channel" + ENDLINE;
@@ -86,7 +86,45 @@ void	ExecutionManager::command_privmsg(std::vector<std::string> out, User *user)
 	//user case
 	else
 	{
-		user->answer = out[1] + " No such channel" + ENDLINE;
+		user->answer = out[1] + " No such nick/channel" + ENDLINE;
+	}
+}
+
+
+void	ExecutionManager::command_notice(std::vector<std::string> out, User *user)
+{
+	std::cout << "command Notice" << std::endl;
+	Channel		*channel;
+	User		*other_user;
+	std::string	channel_name;
+	std::string	msg;
+
+	//channel case
+	if (out[1][0] == '#')
+	{
+		channel_name = out[1].erase(0, 1);
+		if ((channel = find_channel(channel_name)) == NULL || is_in_channel(channel, user) == false)
+		{
+			//Le channel n'existe pas
+			user->answer = out[1] + " No such channel" + ENDLINE;
+		}
+		else
+		{
+			for (int i = 2; i < out.size(); i++)
+				msg += " " + out[i];
+			send_msg_to_channel_users(":" + user->get_nickname() + "!" + user->get_name() + "@server NOTICE #" + channel->get_name() + " " + msg + ENDLINE, user, channel);
+		}
+	}
+	else if((other_user = find_user(out[1])) != NULL)
+	{
+		for (int i = 2; i < out.size(); i++)
+				msg += " " + out[i];
+		send_msg_to_user(":" + other_user->get_nickname() + "!" + other_user->get_name() + "@server NOTICE "+ user->get_nickname()+ " :" + msg + ENDLINE, other_user);
+	}
+	//user case
+	else
+	{
+		user->answer = out[1] + " No such nick/channel" + ENDLINE;
 	}
 }
 

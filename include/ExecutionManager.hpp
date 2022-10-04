@@ -18,7 +18,8 @@ enum	Command_lst
 	TOPIC,
 	KICK,
 	PING,
-	QUIT
+	QUIT,
+	NOTICE
 };
 
 class	ExecutionManager {
@@ -55,6 +56,7 @@ class	ExecutionManager {
 		void	command_user(std::vector<std::string> out, User *user);
 		void	command_join(std::vector<std::string> out, User *user, std::string str);
 		void	command_privmsg(std::vector<std::string> out, User *user);
+		void	command_notice(std::vector<std::string> out, User *user);
 		void	command_part(std::vector<std::string> out, User *user);
 		void	command_topic(std::vector<std::string> out, User *user);
 		void	command_kick(std::vector<std::string> out, User *user);
@@ -68,7 +70,6 @@ class	ExecutionManager {
 		void	delete_channel(Channel *channel);
 		bool	check_nickname(std::string nickname);
 		void	remove_user_of_channel(Channel *channel, User *user);
-
 
 	private:
 
