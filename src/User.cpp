@@ -7,10 +7,10 @@ User::User(void) : wlcm_send(0), _nb_channel(0)
 	_channels = new std::vector<Channel>;
 }
 
-User::User(User const &cpy) : wlcm_send(0), _nb_channel(0)
+User::User(User const &cpy) : wlcm_send(cpy.wlcm_send), _nb_channel(cpy._nb_channel)
 {
 	*this = cpy;
-	_channels = new std::vector<Channel>;
+	_channels = cpy._channels;
 }
 
 User::~User(void)
@@ -26,6 +26,7 @@ User	&User::operator=(User const &src)
 	this->answer = src.answer;
 	this->wlcm_send = src.wlcm_send;
 	this->_nb_channel = src._nb_channel;
+	this->_channels = src._channels;
 	return (*this);
 }
 

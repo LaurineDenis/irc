@@ -54,6 +54,7 @@ void	Command::command_join(std::vector<std::string> out, User *user, Server *ser
 	Channel		*channel;
 	std::string	channel_name;
 	int			i = 1;
+	std::string	msg = "";
 
 	std::cout << out.size() << std::endl;
 	while (i < out.size() && out[i][0] =='#')
@@ -70,6 +71,21 @@ void	Command::command_join(std::vector<std::string> out, User *user, Server *ser
 		}
 		add_channel_in_user(channel, user);
 		user->answer += ":" + user->get_nickname() + "!" + user->get_nickname() + "@server JOIN #" + channel->get_name() + ENDLINE;
+		if (channel->get_topic() != "")
+			user->answer += ":server 332 " +  user->get_name() + " #" + channel->get_name() + " :" + channel->get_topic() + ENDLINE + ":server 333 " +  user->get_name() + " #" + channel->get_name() + " " + channel->get_topic_user() + " " + channel->get_topic_time() + ENDLINE;
+		if (channel->_users->size() > 1)
+		{
+			for (int i = 0; i < channel->_users->size(); i++)
+			{
+				if (i != 0)
+					msg += " ";
+				if (channel->_users->at(i).get_nickname() == channel->get_operator()->get_nickname())
+					msg+= "@";
+				msg += channel->_users->at(i).get_nickname();
+			}
+			user->answer += ":server 353 " +  user->get_name() + " = #" + channel->get_name() + " :" + msg + ENDLINE;
+		}
+		send_msg_to_channel_users(":" + user->get_nickname() + "!" + user->get_nickname() + "@server JOIN #" + channel->get_name() + ENDLINE, user, channel, server);
 		i++;
 	}
 	if (i != out.size())
@@ -78,11 +94,25 @@ void	Command::command_join(std::vector<std::string> out, User *user, Server *ser
 	}
 }
 
+bool	is_in_channel(Channel *channel, User *user)
+{
+	int i = 0;
+	for (std::vector<User>::iterator ite = channel->_users->begin(); ite != channel->_users->end(); ite++, i++)
+		if (ite->get_nickname() == user->get_nickname())
+			return (true) ;
+	return (false);
+}
+
 void	add_channel_in_user(Channel *channel, User *user)
 {
 	//add channel in user
+	std::cout << "Add channel in user" << std::endl;
+	std::cout << "User : " << user->get_nickname() << std::endl;
+	std::cout << "Channel : " << channel->get_name() << std::endl;
 	user->_channels->push_back(*channel);
 	user->set_nb_channel(user->get_nb_channel() + 1);
+	if (is_in_channel(channel, user) == false)
+		channel->_users->push_back(*user);
 }
 
 void	delete_channel(Channel *channel, Server *server)
@@ -108,7 +138,7 @@ void	remove_user_of_channel(Channel *channel, User *user, Server *server)
 	//supprimer le user dans channel
 	i = 0;
 	for (std::vector<User>::iterator ite = channel->_users->begin(); ite != channel->_users->end(); ite++, i++)
-		if (ite->get_name() == user->get_name())
+		if (ite->get_nickname() == user->get_nickname())
 			break ;
 	channel->_users->erase(channel->_users->begin() + i);
 	//supprimer le channel si 0 users
@@ -137,6 +167,7 @@ void	Command::command_part(std::vector<std::string> out, User *user, Server *ser
 			remove_user_of_channel(channel, user, server);
 			user->answer = ":" + user->get_nickname() + "!" + user->get_name() + "@server PART #" + channel->get_name() + ENDLINE;
 			std::cout << "send = " << user->answer << std::endl;
+			send_msg_to_channel_users(":" + user->get_nickname() + "!" + user->get_nickname() + "@server PART #" + channel->get_name() + ENDLINE, user, channel, server);
 		}
 	}
 	else
