@@ -16,6 +16,7 @@ Channel::Channel(User *creator, std::string name)
 	_users = new std::vector<User>;
 	_users->push_back(*creator);
 	//mettre le user en operator dans user
+	_banned = new std::vector<User>;
 	_topic = "";
 	_topic_user = "";
 	_topic_time = "";
@@ -33,7 +34,9 @@ Channel		&Channel::operator=(Channel const &cpy)
 	_operator = cpy._operator;
 	_name = cpy._name;
 	_users = new std::vector<User>;
+	_banned = new std::vector<User>;
 	_users = cpy._users;
+	_banned = cpy._banned;
 	_topic = cpy._topic;
 	_topic_user = cpy._topic_user;
 	_topic_time = cpy._topic_time;
@@ -93,4 +96,17 @@ User				*Channel::get_operator()
 void					Channel::set_operator(User *user)
 {
 	_operator = user;
+}
+
+bool				Channel::banned_user(User *user)
+{
+	_banned->push_back(*user);
+}
+
+bool				Channel::is_banned(User *user)
+{
+	for (std::vector<User>::iterator ite = _banned->begin(); ite != _banned->end(); ite++)
+		if (ite->get_nickname() == user->get_nickname())
+			return (true) ;
+	return (false);
 }

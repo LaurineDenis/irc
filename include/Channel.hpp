@@ -24,6 +24,8 @@ class	Channel
 		void					set_topic_user(std::string topic_user);
 		void					set_topic_time(std::string topic_time);
 		void					set_operator(User *user);
+		bool					banned_user(User *user);
+		bool					is_banned(User *user);
 		std::vector<User>		*_users;
 
 	private:

@@ -162,13 +162,15 @@ std::string		ExecutionManager::recvCmd(int i)
 
 void		ExecutionManager::IO_Operation()
 {
-	ssize_t			ret;
-	std::string		cmd;
+	ssize_t						ret;
+	std::string					cmd;
+	std::vector<std::string>	split_cmd;
 
 	for (int i = 1; i < this->_clientSd.size(); i++)
 	{
 		cmd = "";
 		cmd = recvCmd(i);
+		split_cmd = split_vector(cmd, "\r\n");
 		if (!cmd.size() && this->_clientSd.at(i).events & POLLHUP)
 		{
 			std::cout << "User " << this->_clientSd.at(i).fd << " disconnected!" << std::endl;
@@ -176,9 +178,12 @@ void		ExecutionManager::IO_Operation()
 		}
 		else
 		{
-			if (cmd.length())
-				this->dispatchCmd(&this->_users->at(i - 1), cmd);
-			this->sendRpl();
+			for (int j = 0; j < split_cmd.size(); j++)
+			{
+				if (split_cmd.at(j).length())
+					this->dispatchCmd(&this->_users->at(i - 1), split_cmd.at(j));
+				this->sendRpl();
+			}
 		}
 	}
 }

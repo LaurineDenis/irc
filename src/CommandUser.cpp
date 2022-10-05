@@ -42,16 +42,12 @@ void	ExecutionManager::send_msg_to_user(std::string msg, User *other_user)
 User	*ExecutionManager::find_user(std::string nickname)
 {
  	size_t		size;
-	// size_t		i;
 
 	if (!_users)
 		return (NULL);
 	size = _users->size();
-	// std::cout << "find channel size = " << size << std::endl;
 	for (size_t i = 0; i < size; i++)
 	{
-		// std::cout << "find channel i = " << i << std::endl;
-		// std::cout << "find channel name = " << _channels->at(i).get_name() << std::endl;
 		if (nickname == _users->at(i).get_nickname())
 			return (&_users->at(i));
 	}

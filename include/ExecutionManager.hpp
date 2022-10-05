@@ -67,6 +67,7 @@ class	ExecutionManager {
 		Channel	*find_channel(std::string channel_name);
 		void	delete_channel(Channel *channel);
 		bool	check_nickname(std::string nickname);
+		bool	is_operator(User *user, Channel *channel);
 		void	remove_user_of_channel(Channel *channel, User *user);
 
 
