@@ -16,13 +16,15 @@ class	Server {
 
 		/* GETTER & SETTER */
 
-		int		getSocket()						{return (this->_socket);};
+		int				getSocket()						{return (this->_socket);};
+		std::string		getPw()							{return (this->_pw);};
 
 		/* MEMBER FCTS */
 
-		void	init(int ac, char **av);
-		void	start(ExecutionManager *exec);
-		void	run(ExecutionManager *exec);
+		void			init(int ac, char **av);
+		void			start(ExecutionManager *exec);
+		void			run(ExecutionManager *exec);
+		static void		signalHandler(int sig);
 
 	private:
 

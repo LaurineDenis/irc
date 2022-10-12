@@ -52,7 +52,8 @@ void	ExecutionManager::command_user(std::vector<std::string> out, User *user)
 	}
 }
 
-void	ExecutionManager::command_quit(std::vector<std::string> out, User *user)
+void	ExecutionManager::command_quit(User *user, int index)
 {
 	std::cout << "command Quit" << std::endl;
+	deleteUser(index);
 }

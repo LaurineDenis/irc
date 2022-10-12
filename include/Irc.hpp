@@ -3,6 +3,7 @@
 
 # include <sys/socket.h> 
 # include <iostream>
+# include <signal.h>
 # include <sys/types.h>
 # include <sys/socket.h> 
 # include <poll.h> 
@@ -13,7 +14,6 @@
 # include <unistd.h>
 # include "Server.hpp"
 # include "Channel.hpp"
-// # include "Command.hpp"
 # include "Message.hpp"
 # include "User.hpp"
 # include "ExecutionManager.hpp"

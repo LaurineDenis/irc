@@ -53,6 +53,21 @@ void	ExecutionManager::send_msg_to_channel_users(std::string msg, User *user, Ch
 	}
 }
 
+void	ExecutionManager::command_pass(std::vector<std::string> out, User *user)
+{
+	if (out[1].empty())
+		user->answer = "461 PASS :Not enough parameters\r\n";
+	else if (out[1] != _password)
+		user->answer = "464 :Password incorrect\r\n";
+	else
+	{
+		user->set_checkPw(1);
+		return;
+	}
+	deleteUser(_users->size() - 1);
+	std::cout << _users->size() << std::endl;
+}
+
 void	ExecutionManager::command_privmsg(std::vector<std::string> out, User *user)
 {
 	std::cout << "command Privmsg" << std::endl;

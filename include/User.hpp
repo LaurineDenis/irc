@@ -24,6 +24,7 @@ class	User
 		void					set_nickname(std::string nickname);
 		void					set_name(std::string name);
 		void					set_password(std::string password);
+		void					set_checkPw(bool i);
 		bool					wlcm_send;
 		std::string				answer;
 		std::vector<Channel>	*_channels;
@@ -34,6 +35,7 @@ class	User
 		std::string				_name;
 		std::string				_password;
 		int						_nb_channel;
+		bool					_checkPw;
 };
 
 #endif

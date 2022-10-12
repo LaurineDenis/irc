@@ -1,4 +1,7 @@
 #include "../include/Irc.hpp"
+#include <cstdlib>
+
+static volatile bool	_shutdown = 0;
 
 void	Server::init(int ac, char **av)
 {
@@ -12,13 +15,13 @@ void	Server::init(int ac, char **av)
 	}
 	pw = av[2];
 	port = av[1];
+	_shutdown = 0;
 	this->_pw = pw;
 	this->_port = std::stod(port);
 	if (this->_port > 65535 || this->_port < 1024) // a check
 	{
 		std::cerr << " 1024 < <port> < 65535" << std::endl;
 	}
-	return;
 }
 
 void		Server::start(ExecutionManager *exec)
@@ -52,24 +55,36 @@ void		Server::start(ExecutionManager *exec)
 	std::cout << "Waiting for connections ... " << std::endl;
 }
 
+void	Server::signalHandler(int sig)
+{
+	if (sig == SIGINT)
+	{
+		std::cout << "CTRL C caught" << std::endl;
+		_shutdown = 1;
+	}
+	exit (EXIT_SUCCESS);
+}
+
 void	Server::run(ExecutionManager *exec)
 {
 	int		events;
 
 	/* ADD PASSWORD REQUEST */
-	while (TRUE)
+	while (!_shutdown)
 	{
+		signal(SIGINT, signalHandler);
+		if (_shutdown)
+			break;
 		events = exec->checkPoll();
-		if (events < 0)
+		if (events < 0 && !_shutdown)
 		{
 			std::cerr << "Poll failed" << std::endl;
 			exit(EXIT_FAILURE);
 		}
 		else if (events == 1)
-		{
 			exec->newConnection();
-		}
 		else
 			exec->IO_Operation();
 	}
+	exec->shutdown();
 }
