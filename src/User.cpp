@@ -1,6 +1,6 @@
 #include "../include/Irc.hpp"
 
-User::User(void) : wlcm_send(0), _nb_channel(0)
+User::User(void) : wlcm_send(0), _nb_channel(0), _checkPw(0)
 {
 	answer = "";
 	std::cout << "Constructor User by default called" << std::endl;
@@ -43,6 +43,11 @@ std::string		User::get_name()
 std::string		User::get_password()
 {
 	return (_password);
+}
+
+void			User::set_checkPw(bool i)
+{
+	_checkPw = i;
 }
 
 void			User::set_nickname(std::string nickname)

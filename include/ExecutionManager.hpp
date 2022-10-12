@@ -9,6 +9,7 @@ class	Server;
 
 enum	Command_lst
 {
+	PASS,
 	NICK,
 	USER,
 	CAP,
@@ -46,9 +47,10 @@ class	ExecutionManager {
 		void		newConnection();
 		void		deleteUser(int i); 
 		void		sendRpl();
-		void		dispatchCmd(User *user, std::string buffer);
+		void		dispatchCmd(User *user, std::string buffer, int index);
 		void		IO_Operation();
 		std::string		recvCmd(int i);
+		void	command_pass(std::vector<std::string> out, User *user);
 		void	command_cap(std::vector<std::string> out);
 		void	command_ping(std::vector<std::string> out);
 		void	command_nick(std::vector<std::string> out, User *user);
@@ -58,7 +60,7 @@ class	ExecutionManager {
 		void	command_part(std::vector<std::string> out, User *user);
 		void	command_topic(std::vector<std::string> out, User *user);
 		void	command_kick(std::vector<std::string> out, User *user);
-		void	command_quit(std::vector<std::string> out, User *user);
+		void	command_quit(User *user, int index);
 		void	change_topic(std::string topic, std::string user, Channel *channel);
 		void	send_msg_to_channel_users(std::string msg, User *user, Channel *channel);
 		void	send_msg_to_user(std::string msg, User *other_user);
@@ -69,6 +71,7 @@ class	ExecutionManager {
 		bool	check_nickname(std::string nickname);
 		bool	is_operator(User *user, Channel *channel);
 		void	remove_user_of_channel(Channel *channel, User *user);
+		void	shutdown();
 
 
 	private:
@@ -76,7 +79,6 @@ class	ExecutionManager {
 		std::vector<Channel>		*_channels;
 		std::vector<User>			*_users;
 		std::vector<struct pollfd>	_clientSd;
-		std::vector<int>			_clientFd;
 		std::string					_password;
 		std::string					_address;
 		int							_port;

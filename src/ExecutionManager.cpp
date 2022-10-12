@@ -1,4 +1,5 @@
 #include "../include/Irc.hpp"
+#include <cstdlib>
 #include <cstring>
 #include <sys/poll.h>
 #include <sys/socket.h>
@@ -25,6 +26,7 @@ void		ExecutionManager::init(Server *server)
 {
 	this->_users = new std::vector<User>;
 	this->_channels = new std::vector<Channel>;
+	this->_password = server->getPw();
 	this->addSd(server->getSocket(), POLLIN);
 	this->_address = "127.0.0.1";
 }
@@ -59,17 +61,23 @@ void		ExecutionManager::newConnection()
 void		ExecutionManager::deleteUser(int i)
 {
 	/* supprimer user des channels */
+	/* for (int j = 0; j < _channels.size(); j++) */
+	/* { */
+	/* 	command_part */
+	/* } */
 	this->_users->erase(this->_users->cbegin() + i);
+	this->_clientSd.erase(this->_clientSd.cbegin() + i + 1);
 	/* close connection? */
 }
 
-void		ExecutionManager::dispatchCmd(User *user, std::string buffer)
+void		ExecutionManager::dispatchCmd(User *user, std::string buffer, int index)
 {
 	std::vector<std::string>	out;
-	std::string					cmd_name[10] = {"NICK", "USER", "CAP", "JOIN", "PRIVMSG", "PART", "TOPIC", "KICK", "PING", "QUIT"};
+	std::string					cmd_name[11] = {"PASS", "NICK", "USER", "CAP", "JOIN", "PRIVMSG", "PART", "TOPIC", "KICK", "PING", "QUIT"};
 	int							i;
 	// ExecutionManager			manager;
 
+	/* CHECK IF PASSWORD WAS SENT BEFORE WELCOME */
 	out = split_vector(buffer, " \r\n");
 	/* print_infos(server); */
 	std::cout << "User cmd : " << user->get_nickname() << std::endl;
@@ -83,6 +91,9 @@ void		ExecutionManager::dispatchCmd(User *user, std::string buffer)
 	}
 	switch (i)
 	{
+		case PASS :
+			std::cout << "Pass switch" << std::endl;
+			command_pass(out, user);
 		case CAP :
 			std::cout << "Cap switch" << std::endl;
 			command_cap(out);
@@ -121,11 +132,20 @@ void		ExecutionManager::dispatchCmd(User *user, std::string buffer)
 			break;
 		case QUIT :
 			std::cout << "Quit switch" << std::endl;
-			command_quit(out, user);
+			command_quit(user, index);
 			break;
 		default :
 			std::cout << "Unknow command" << std::endl;
 	}
+}
+
+void		ExecutionManager::shutdown()
+{
+	std::cout << "Shutting down server ..." << std::endl;
+	_users->clear();
+	_channels->clear();
+	close(_clientSd.at(0).fd);
+	_clientSd.clear();
 }
 
 void		ExecutionManager::sendRpl()
@@ -174,16 +194,13 @@ void		ExecutionManager::IO_Operation()
 		if (!cmd.size() && this->_clientSd.at(i).events & POLLHUP)
 		{
 			std::cout << "User " << this->_clientSd.at(i).fd << " disconnected!" << std::endl;
-			this->deleteUser(i);
+			command_quit(&this->_users->at(i - 1), i);
 		}
 		else
 		{
-			for (int j = 0; j < split_cmd.size(); j++)
-			{
-				if (split_cmd.at(j).length())
-					this->dispatchCmd(&this->_users->at(i - 1), split_cmd.at(j));
-				this->sendRpl();
-			}
+			if (cmd.length())
+				this->dispatchCmd(&this->_users->at(i - 1), cmd, i - 1);
+			this->sendRpl();
 		}
 	}
 }
