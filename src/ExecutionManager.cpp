@@ -112,7 +112,7 @@ void		ExecutionManager::dispatchCmd(User *user, std::string buffer, int index)
 			break;
 		case JOIN :
 			std::cout << "Join switch" << std::endl;
-			command_join(out, user);
+			command_join(out, user, buffer);
 			break;
 		case PRIVMSG :
 			std::cout << "Privmsg switch" << std::endl;
@@ -182,13 +182,15 @@ std::string		ExecutionManager::recvCmd(int i)
 
 void		ExecutionManager::IO_Operation()
 {
-	ssize_t			ret;
-	std::string		cmd;
+	ssize_t						ret;
+	std::string					cmd;
+	std::vector<std::string>	split_cmd;
 
 	for (int i = 1; i < this->_clientSd.size(); i++)
 	{
 		cmd = "";
 		cmd = recvCmd(i);
+		split_cmd = split_vector(cmd, "\r\n");
 		if (!cmd.size() && this->_clientSd.at(i).events & POLLHUP)
 		{
 			std::cout << "User " << this->_clientSd.at(i).fd << " disconnected!" << std::endl;

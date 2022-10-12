@@ -33,6 +33,27 @@ void	ExecutionManager::command_nick(std::vector<std::string> out, User *user)
 	//ajouter si quelqu'un a deja le nickname
 }
 
+void	ExecutionManager::send_msg_to_user(std::string msg, User *other_user)
+{
+	other_user->answer = msg;
+	std::cout << other_user->answer << std::endl;
+}
+
+User	*ExecutionManager::find_user(std::string nickname)
+{
+ 	size_t		size;
+
+	if (!_users)
+		return (NULL);
+	size = _users->size();
+	for (size_t i = 0; i < size; i++)
+	{
+		if (nickname == _users->at(i).get_nickname())
+			return (&_users->at(i));
+	}
+	return (NULL);
+}
+
 bool	ExecutionManager::check_nickname(std::string nickname)
 {
 	for (std::vector<User>::iterator it = _users->begin(); it != _users->end(); it++)

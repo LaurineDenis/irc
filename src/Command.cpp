@@ -72,6 +72,7 @@ void	ExecutionManager::command_privmsg(std::vector<std::string> out, User *user)
 {
 	std::cout << "command Privmsg" << std::endl;
 	Channel		*channel;
+	User		*other_user;
 	std::string	channel_name;
 	std::string	msg;
 
@@ -90,6 +91,12 @@ void	ExecutionManager::command_privmsg(std::vector<std::string> out, User *user)
 				msg += " " + out[i];
 			send_msg_to_channel_users(":" + user->get_nickname() + "!" + user->get_name() + "@server PRIVMSG #" + channel->get_name() + " " + msg + ENDLINE, user, channel);
 		}
+	}
+	else if((other_user = find_user(out[1])) != NULL)
+	{
+		for (int i = 2; i < out.size(); i++)
+				msg += " " + out[i];
+		send_msg_to_user(":" + other_user->get_nickname() + "!" + other_user->get_name() + "@server PRIVMSG "+ user->get_nickname()+ " :" + msg + ENDLINE, other_user);
 	}
 	//user case
 	else

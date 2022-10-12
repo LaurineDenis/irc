@@ -55,7 +55,7 @@ class	ExecutionManager {
 		void	command_ping(std::vector<std::string> out);
 		void	command_nick(std::vector<std::string> out, User *user);
 		void	command_user(std::vector<std::string> out, User *user);
-		void	command_join(std::vector<std::string> out, User *user);
+		void	command_join(std::vector<std::string> out, User *user, std::string str);
 		void	command_privmsg(std::vector<std::string> out, User *user);
 		void	command_part(std::vector<std::string> out, User *user);
 		void	command_topic(std::vector<std::string> out, User *user);
@@ -63,10 +63,13 @@ class	ExecutionManager {
 		void	command_quit(User *user, int index);
 		void	change_topic(std::string topic, std::string user, Channel *channel);
 		void	send_msg_to_channel_users(std::string msg, User *user, Channel *channel);
+		void	send_msg_to_user(std::string msg, User *other_user);
 		void	print_infos();
+		User	*find_user(std::string nickname);
 		Channel	*find_channel(std::string channel_name);
 		void	delete_channel(Channel *channel);
 		bool	check_nickname(std::string nickname);
+		bool	is_operator(User *user, Channel *channel);
 		void	remove_user_of_channel(Channel *channel, User *user);
 		void	shutdown();
 
