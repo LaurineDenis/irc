@@ -166,14 +166,15 @@ void		ExecutionManager::sendRpl()
 
 std::string		ExecutionManager::recvCmd(int i)
 {
-	std::string		cmd;
-	ssize_t			ret = 1;
+	std::string		cmd = "";
+	ssize_t			ret = 0;
 	char			buffer[4096] = {0};
 
-	while (cmd.find(ENDLINE, 0) == std::string::npos && ret > 0)
+	while (cmd.find(ENDLINE, 0) == std::string::npos)
 	{
-		ret += recv(this->_clientSd.at(i).fd, buffer, sizeof(buffer), 0);
-		buffer[ret] = 0;
+		std::cout << cmd.find(ENDLINE, 0) << std::endl;
+		ret += recv(this->_clientSd.at(i).fd, buffer + ret, sizeof(buffer), 0);
+		buffer[ret + 1] = 0;
 		cmd = buffer;
 	}
 	this->_clientSd.at(i).revents = 0;
@@ -190,6 +191,7 @@ void		ExecutionManager::IO_Operation()
 	{
 		cmd = "";
 		cmd = recvCmd(i);
+		std::cout << "cmd == " << cmd << std::endl;
 		split_cmd = split_vector(cmd, "\r\n");
 		if (!cmd.size() && this->_clientSd.at(i).events & POLLHUP)
 		{

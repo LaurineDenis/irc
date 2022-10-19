@@ -58,10 +58,7 @@ void		Server::start(ExecutionManager *exec)
 void	Server::signalHandler(int sig)
 {
 	if (sig == SIGINT)
-	{
-		std::cout << "CTRL C caught" << std::endl;
 		_shutdown = 1;
-	}
 	exit (EXIT_SUCCESS);
 }
 
@@ -69,12 +66,11 @@ void	Server::run(ExecutionManager *exec)
 {
 	int		events;
 
-	/* ADD PASSWORD REQUEST */
 	while (!_shutdown)
 	{
 		signal(SIGINT, signalHandler);
-		if (_shutdown)
-			break;
+		/* if (_shutdown) */
+		/* 	break; */
 		events = exec->checkPoll();
 		if (events < 0 && !_shutdown)
 		{
