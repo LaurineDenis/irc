@@ -3,7 +3,7 @@
 
 # include "Irc.hpp"
 
-class	User;
+class	Client;
 class	Channel;
 class	Server;
 
@@ -28,8 +28,8 @@ class	ExecutionManager {
 
 		/* CONSTRUCTOR && DESTRUCTOR */
 
-		ExecutionManager()								{};
-		~ExecutionManager()								{};
+		ExecutionManager()	{};
+		~ExecutionManager()	{};
 
 		/* SETTER */
 
@@ -42,42 +42,47 @@ class	ExecutionManager {
 		
 		void		init(Server *server);
 		void		addSd(int socket, short events);
-		void		newUser(int newSocket);
+		void		newClient(int newSocket);
 		int			checkPoll();
 		void		newConnection();
-		void		deleteUser(int i); 
+		void		deleteClient(int i); 
+		void		init_cmd();
 		void		sendRpl();
-		void		dispatchCmd(User *user, std::string buffer, int index);
+		void		dispatchCmd(Client *client, std::vector<std::string> line, int index, int cmd);
+		void		parseCmd(Client *client, std::string buffer, int index);
 		void		IO_Operation();
 		std::string		recvCmd(int i);
-		void	command_pass(std::vector<std::string> out, User *user);
+		bool	parse_channel_name(std::string channel_name);
+		void	command_pass(std::vector<std::string> out, Client *client);
 		void	command_cap(std::vector<std::string> out);
 		void	command_ping(std::vector<std::string> out);
-		void	command_nick(std::vector<std::string> out, User *user);
-		void	command_user(std::vector<std::string> out, User *user);
-		void	command_join(std::vector<std::string> out, User *user, std::string str);
-		void	command_privmsg(std::vector<std::string> out, User *user);
-		void	command_part(std::vector<std::string> out, User *user);
-		void	command_topic(std::vector<std::string> out, User *user);
-		void	command_kick(std::vector<std::string> out, User *user);
-		void	command_quit(User *user, int index);
-		void	change_topic(std::string topic, std::string user, Channel *channel);
-		void	send_msg_to_channel_users(std::string msg, User *user, Channel *channel);
-		void	send_msg_to_user(std::string msg, User *other_user);
+		void	command_nick(std::vector<std::string> out, Client *client);
+		void	command_client(std::vector<std::string> out, Client *client);
+		void	command_join(std::vector<std::string> out, Client *client);
+		void	command_privmsg(std::vector<std::string> out, Client *client);
+		void	command_part(std::vector<std::string> out, Client *client);
+		void	command_topic(std::vector<std::string> out, Client *client);
+		void	command_kick(std::vector<std::string> out, Client *client);
+		void	command_quit(Client *client, int index);
+		void	change_topic(std::string topic, std::string client, Channel *channel);
+		void	send_msg_to_channel_clients(std::string msg, Client *client, Channel *channel);
+		void	send_msg_to_client(std::string msg, Client *other_client);
 		void	print_infos();
-		User	*find_user(std::string nickname);
+		Client	*find_client(std::string nickname);
 		Channel	*find_channel(std::string channel_name);
 		void	delete_channel(Channel *channel);
 		bool	check_nickname(std::string nickname);
-		bool	is_operator(User *user, Channel *channel);
-		void	remove_user_of_channel(Channel *channel, User *user);
+		bool	is_operator(Client *client, Channel *channel);
+		bool	is_register(Client *client);
+		int		is_command(std::vector<std::string> line);
+		void	remove_client_of_channel(Channel *channel, Client *client);
 		void	shutdown();
 
 
 	private:
 
 		std::vector<Channel>		*_channels;
-		std::vector<User>			*_users;
+		std::vector<Client>			*_clients;
 		std::vector<struct pollfd>	_clientSd;
 		std::string					_password;
 		std::string					_address;
@@ -85,7 +90,7 @@ class	ExecutionManager {
 		int							_clientAmount;
 		socklen_t					_addrlen;
 		struct	sockaddr_in			_sockAdrr;
-
+		std::vector<std::string>	*_cmd_name;
 };
 
 #endif

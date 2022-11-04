@@ -1,24 +1,24 @@
 #include "../include/Irc.hpp"
 
-User::User(void) : wlcm_send(0), _nb_channel(0), _check_pw(0)
+Client::Client(void) : wlcm_send(0), _nb_channel(0), _checkPw(0)
 {
 	answer = "";
-	std::cout << "Constructor User by default called" << std::endl;
+	std::cout << "Constructor Client by default called" << std::endl;
 	_channels = new std::vector<Channel>;
 }
 
-User::User(User const &cpy) : wlcm_send(cpy.wlcm_send), _nb_channel(cpy._nb_channel)
+Client::Client(Client const &cpy) : wlcm_send(cpy.wlcm_send), _nb_channel(cpy._nb_channel)
 {
 	*this = cpy;
 	_channels = cpy._channels;
 }
 
-User::~User(void)
+Client::~Client(void)
 {
-	std::cout << "Destructor User called" << std::endl;
+	std::cout << "Destructor Client called" << std::endl;
 }
 
-User	&User::operator=(User const &src)
+Client	&Client::operator=(Client const &src)
 {
 	this->_name = src._name;
 	this->_nickname = src._nickname;
@@ -30,53 +30,53 @@ User	&User::operator=(User const &src)
 	return (*this);
 }
 
-std::string		User::get_nickname()
+std::string		Client::get_nickname()
 {
 	return (_nickname);
 }
 
-std::string		User::get_name()
+std::string		Client::get_name()
 {
 	return (_name);
 }
 
-std::string		User::get_password()
+std::string		Client::get_password()
 {
 	return (_password);
 }
 
-void			User::set_checkPw(bool i)
+void			Client::set_checkPw(bool i)
 {
 	_check_pw = i;
 }
 
-void			User::set_nickname(std::string nickname)
+void			Client::set_nickname(std::string nickname)
 {
 	// std::cout << "Set NickName" << std::endl;
 	if (_nickname != nickname)
 		_nickname = nickname;
 }
 
-void			User::set_name(std::string name)
+void			Client::set_name(std::string name)
 {
 	// std::cout << "Set Name = |" << name << "|" << std::endl;
 	if (_name != name)
 		_name = name;
 }
 
-void			User::set_password(std::string password)
+void			Client::set_password(std::string password)
 {
 	// std::cout << "Set Password" << std::endl;
 	if (_password != password)
 		_password = password;
 }
 
-int				User::get_nb_channel()
+int				Client::get_nb_channel()
 {
 	return (_nb_channel);
 }
 
-void			User::set_nb_channel(int nb_channel)
+void			Client::set_nb_channel(int nb_channel)
 {
 	if (nb_channel != _nb_channel)
 		_nb_channel = nb_channel;
