@@ -189,20 +189,29 @@ void		ExecutionManager::IO_Operation()
 
 	for (int i = 1; i < this->_clientSd.size(); i++)
 	{
-		cmd = "";
-		cmd = recvCmd(i);
-		std::cout << "cmd == " << cmd << std::endl;
-		split_cmd = split_vector(cmd, "\r\n");
-		if (!cmd.size() && this->_clientSd.at(i).events & POLLHUP)
+		recvCmd(i);
+		if (_toProcess)
 		{
-			std::cout << "User " << this->_clientSd.at(i).fd << " disconnected!" << std::endl;
-			command_quit(&this->_users->at(i - 1), i);
-		}
-		else
-		{
-			if (cmd.length())
-				this->dispatchCmd(&this->_users->at(i - 1), cmd, i - 1);
+			this->dispatchCmd(&this->_users->at(i - 1), cmd, i - 1);
 			this->sendRpl();
 		}
+		else
+			continue;
+		/* cmd.clear(); */
+		/* cmd.clear(); */
+		/* cmd = recvCmd(i); */
+		/* std::cout << "cmd == " << cmd << std::endl; */
+		/* split_cmd = split_vector(cmd, "\r\n"); */
+		/* if (!cmd.size() && this->_clientSd.at(i).events & POLLHUP) */
+		/* { */
+		/* 	std::cout << "User " << this->_clientSd.at(i).fd << " disconnected!" << std::endl; */
+		/* 	command_quit(&this->_users->at(i - 1), i); */
+		/* } */
+		/* else */
+		/* { */
+		/* 	if (cmd.length()) */
+		/* 		this->dispatchCmd(&this->_users->at(i - 1), cmd, i - 1); */
+		/* 	this->sendRpl(); */
+		/* } */
 	}
 }
