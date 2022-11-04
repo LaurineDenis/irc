@@ -3,7 +3,7 @@
 
 # include "Irc.hpp"
 
-class	User;
+class	Client;
 
 class	Channel
 {
@@ -11,30 +11,30 @@ class	Channel
 
 		Channel();
 		Channel(Channel const &cpy);
-		Channel(User *creator, std::string name);
+		Channel(Client *creator, std::string name);
 		Channel		&operator=(Channel const &cpy);
 		~Channel();
 		std::string				get_name();
 		std::string				get_topic();
-		std::string				get_topic_user();
+		std::string				get_topic_client();
 		std::string				get_topic_time();
-		User					*get_operator();
+		Client					*get_operator();
 		void					set_name(std::string name);
 		void					set_topic(std::string topic);
-		void					set_topic_user(std::string topic_user);
+		void					set_topic_client(std::string topic_client);
 		void					set_topic_time(std::string topic_time);
-		void					set_operator(User *user);
-		bool					banned_user(User *user);
-		bool					is_banned(User *user);
-		std::vector<User>		*_users;
+		void					set_operator(Client *client);
+		bool					banned_client(Client *client);
+		bool					is_banned(Client *client);
+		std::vector<Client>		*_clients;
 
 	private:
 
-		User					*_operator;
-		std::vector<User>		*_banned;
+		Client					*_operator;
+		std::vector<Client>		*_banned;
 		std::string				_name;
 		std::string				_topic;
-		std::string				_topic_user;
+		std::string				_topic_client;
 		std::string				_topic_time;
 };
 
