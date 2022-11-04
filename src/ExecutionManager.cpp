@@ -243,7 +243,7 @@ void		ExecutionManager::IO_Operation()
 
 	for (int i = 1; i < this->_clientSd.size(); i++)
 	{
-		cmd = "";
+		cmd.clear();
 		cmd = recvCmd(i);
 		std::cout << "cmd == " << cmd << std::endl;
 		split_cmd = split(cmd, "\r\n");

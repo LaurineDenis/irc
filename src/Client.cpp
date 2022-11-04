@@ -47,7 +47,7 @@ std::string		Client::get_password()
 
 void			Client::set_checkPw(bool i)
 {
-	_checkPw = i;
+	_check_pw = i;
 }
 
 void			Client::set_nickname(std::string nickname)
@@ -81,3 +81,4 @@ void			Client::set_nb_channel(int nb_channel)
 	if (nb_channel != _nb_channel)
 		_nb_channel = nb_channel;
 }
+
