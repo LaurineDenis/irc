@@ -1,6 +1,6 @@
 #include "../include/Irc.hpp"
 
-std::vector<std::string> split_vector(std::string str, std::string delims)
+std::vector<std::string> split(std::string str, std::string delims)
 {
 	size_t						beg, pos = 0;
 	std::vector<std::string>	token;

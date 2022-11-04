@@ -10,20 +10,20 @@ void	ExecutionManager::print_infos()
 		{
 			std::cout << "\t" << it->get_name() << std::endl;
 			std::cout << "\tOperator is : " << it->get_operator()->get_nickname() << std::endl;
-			if (!_channels->data()->_users->empty())
+			if (!_channels->data()->_clients->empty())
 			{
-				std::cout << "\t\tUser in channel" << std::endl;
-				for (std::vector<User>::iterator it = _channels->data()->_users->begin(); it != _channels->data()->_users->end(); it++)
+				std::cout << "\t\tClient in channel" << std::endl;
+				for (std::vector<Client>::iterator it = _channels->data()->_clients->begin(); it != _channels->data()->_clients->end(); it++)
 					std::cout << "\t\t\t" << it->get_nickname() << std::endl;
 			}
 		}
 	}
 	else
 		std::cout << "\tNo Channels" << std::endl;
-	std::cout << "Users" << std::endl;
-	if (_users)
+	std::cout << "Clients" << std::endl;
+	if (_clients)
 	{
-		for (std::vector<User>::iterator it = _users->begin(); it != _users->end(); it++)
+		for (std::vector<Client>::iterator it = _clients->begin(); it != _clients->end(); it++)
 		{
 			std::cout << "\t" << it->get_nickname() << std::endl;
 			if (it->get_nb_channel() != 0)
@@ -37,9 +37,9 @@ void	ExecutionManager::print_infos()
 	std::cout << "-------End Print-------\n" << std::endl;
 }
 
-void	ExecutionManager::send_msg_to_channel_users(std::string msg, User *user, Channel *channel)
+void	ExecutionManager::send_msg_to_channel_clients(std::string msg, Client *user, Channel *channel)
 {
-	for (std::vector<User>::iterator it = _users->begin(); it != _users->end(); it++)
+	for (std::vector<Client>::iterator it = _clients->begin(); it != _clients->end(); it++)
 	{
 		//envoyer le message si l'user n'est pas en mode off ??
 		for (std::vector<Channel>::iterator ite = it->_channels->begin(); ite != it->_channels->end(); ite++)
@@ -53,7 +53,7 @@ void	ExecutionManager::send_msg_to_channel_users(std::string msg, User *user, Ch
 	}
 }
 
-void	ExecutionManager::command_pass(std::vector<std::string> out, User *user)
+void	ExecutionManager::command_pass(std::vector<std::string> out, Client *user)
 {
 	if (out[1].empty())
 		user->answer = "461 PASS :Not enough parameters\r\n";
@@ -64,15 +64,15 @@ void	ExecutionManager::command_pass(std::vector<std::string> out, User *user)
 		user->set_checkPw(1);
 		return;
 	}
-	deleteUser(_users->size() - 1);
-	std::cout << _users->size() << std::endl;
+	deleteClient(_clients->size() - 1);
+	std::cout << _clients->size() << std::endl;
 }
 
-void	ExecutionManager::command_privmsg(std::vector<std::string> out, User *user)
+void	ExecutionManager::command_privmsg(std::vector<std::string> out, Client *user)
 {
 	std::cout << "command Privmsg" << std::endl;
 	Channel		*channel;
-	User		*other_user;
+	Client		*other_user;
 	std::string	channel_name;
 	std::string	msg;
 
@@ -89,14 +89,14 @@ void	ExecutionManager::command_privmsg(std::vector<std::string> out, User *user)
 		{
 			for (int i = 2; i < out.size(); i++)
 				msg += " " + out[i];
-			send_msg_to_channel_users(":" + user->get_nickname() + "!" + user->get_name() + "@server PRIVMSG #" + channel->get_name() + " " + msg + ENDLINE, user, channel);
+			send_msg_to_channel_clients(":" + user->get_nickname() + "!" + user->get_name() + "@server PRIVMSG #" + channel->get_name() + " " + msg + ENDLINE, user, channel);
 		}
 	}
-	else if((other_user = find_user(out[1])) != NULL)
+	else if((other_user = find_client(out[1])) != NULL)
 	{
 		for (int i = 2; i < out.size(); i++)
 				msg += " " + out[i];
-		send_msg_to_user(":" + other_user->get_nickname() + "!" + other_user->get_name() + "@server PRIVMSG "+ user->get_nickname()+ " :" + msg + ENDLINE, other_user);
+		send_msg_to_client(":" + other_user->get_nickname() + "!" + other_user->get_name() + "@server PRIVMSG "+ user->get_nickname()+ " :" + msg + ENDLINE, other_user);
 	}
 	//user case
 	else

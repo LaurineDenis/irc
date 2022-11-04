@@ -1,5 +1,5 @@
-#ifndef USER_HPP
- #define USER_HPP
+#ifndef CLIENT_HPP
+ #define CLIENT_HPP
 
  #include <iostream>
  #include <string>
@@ -8,14 +8,14 @@
 
 class Channel;
 
-class	User
+class	Client
 {
 	public:
 
-		User();
-		User(User const &cpy);
-		~User();
-		User					&operator=(User const &src);
+		Client();
+		Client(Client const &cpy);
+		~Client();
+		Client					&operator=(Client const &src);
 		std::string				get_nickname();
 		std::string				get_name();
 		std::string				get_password();
