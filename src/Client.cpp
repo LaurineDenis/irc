@@ -1,8 +1,10 @@
 #include "../include/Irc.hpp"
+#include <string>
 
 Client::Client(void) : wlcm_send(0), _nb_channel(0), _checkPw(0)
 {
 	answer = "";
+	_cmd = "";
 	std::cout << "Constructor Client by default called" << std::endl;
 	_channels = new std::vector<Channel>;
 }
@@ -45,9 +47,14 @@ std::string		Client::get_password()
 	return (_password);
 }
 
+std::string		Client::get_cmd()
+{
+	return (_cmd);
+}
+
 void			Client::set_checkPw(bool i)
 {
-	_checkPw = i;
+	_check_pw = i;
 }
 
 void			Client::set_nickname(std::string nickname)
@@ -81,3 +88,26 @@ void			Client::set_nb_channel(int nb_channel)
 	if (nb_channel != _nb_channel)
 		_nb_channel = nb_channel;
 }
+
+void			Client::set_cmd(std::string cmd)
+{
+	if (cmd.length())
+		_cmd = cmd;
+	else
+		_cmd.erase();
+}
+/* bool			Client::recvCmd(int fd) */
+/* { */
+/* 	std::string		cmd = ""; */
+/* 	ssize_t			ret = 0; */
+/* 	char			buffer[4096] = {0}; */
+
+/* 	while (cmd.find(ENDLINE, 0) == std::string::npos) */
+/* 	{ */
+/* 		std::cout << cmd.find(ENDLINE, 0) << std::endl; */
+/* 		ret += recv(fd, buffer + ret, sizeof(buffer), 0); */
+/* 		buffer[ret + 1] = 0; */
+/* 		cmd = buffer; */
+/* 	} */
+/* 	return (0); */
+/* } */

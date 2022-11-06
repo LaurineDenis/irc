@@ -84,6 +84,17 @@ void		ExecutionManager::deleteClient(int i)
 	/* { */
 	/* 	command_part */
 	/* } */
+	Client	*client = &this->_clients->at(i);
+	Channel	*channel;
+	std::cout << i << std::endl;
+	while (this->_clients->at(i)._channels->size())
+	{
+		std::cout << "|||||" << this->_clients->at(i)._channels->size() << std::endl;
+		channel = &this->_channels->at(0);
+		send_msg_to_channel_clients(":" + client->get_nickname() + "!" + client->get_nickname() + "@server PART #" + channel->get_name() + ENDLINE, client, channel);
+		remove_client_of_channel(channel, client);
+	}
+	std::cout << "wtf?????" << std::endl;
 	this->_clients->erase(this->_clients->cbegin() + i);
 	this->_clientSd.erase(this->_clientSd.cbegin() + i + 1);
 	/* close connection? */
@@ -113,9 +124,9 @@ void		ExecutionManager::parseCmd(Client *client, std::string buffer, int index)
 	std::vector<std::string>	line = split(buffer, " \r\n");
 	int							cmd;
 
-	std::cout << "Parse command " << buffer << std::endl;
-	for (std::vector<std::string>::iterator it = line.begin(); it != line.end(); ++it)
-		std::cout << "|" << *it << "|" << std::endl;
+	/* std::cout << "Parse command " << buffer << std::endl; */
+	/* for (std::vector<std::string>::iterator it = line.begin(); it != line.end(); ++it) */
+	/* 	std::cout << "|" << *it << "|" << std::endl; */
 	if ((cmd = is_command(line)) >= 0)
 	{
 		if (is_register(client))
@@ -148,42 +159,33 @@ void		ExecutionManager::dispatchCmd(Client *client, std::vector<std::string> lin
 	switch (cmd)
 	{
 		case PASS :
-			std::cout << "Pass switch" << std::endl;
 			command_pass(line, client);
+			break;
 		case CAP :
-			std::cout << "Cap switch" << std::endl;
 			command_cap(line);
 			break;
 		case PING :
-			std::cout << "Ping switch" << std::endl;
 			command_ping(line);
 			break;
 		case NICK :
-			std::cout << "Nick switch" << std::endl;
 			command_nick(line, client);
 			break;
 		case USER :
-			std::cout << "Client switch" << std::endl;
 			command_client(line, client);
 			break;
 		case JOIN :
-			std::cout << "Join switch" << std::endl;
 			command_join(line, client);
 			break;
 		case PRIVMSG :
-			std::cout << "Privmsg switch" << std::endl;
 			command_privmsg(line, client);
 			break;
 		case PART :
-			std::cout << "Part switch" << std::endl;
 			command_part(line, client);
 			break;
 		case TOPIC :
-			std::cout << "Topic switch" << std::endl;
 			command_topic(line, client);
 			break;
 		case KICK :
-			std::cout << "Kick switch" << std::endl;
 			command_kick(line, client);
 			break;
 		case MODE :
@@ -191,7 +193,6 @@ void		ExecutionManager::dispatchCmd(Client *client, std::vector<std::string> lin
 			command_mode(line, client);
 			break;
 		case QUIT :
-			std::cout << "Quit switch" << std::endl;
 			command_quit(client, index);
 			break;
 		default :
@@ -224,47 +225,50 @@ void		ExecutionManager::sendRpl()
 	}
 }
 
-std::string		ExecutionManager::recvCmd(int i)
+ssize_t		ExecutionManager::recvCmd(int i)
 {
-	std::string		cmd = "";
+	std::string		cmd;
 	ssize_t			ret = 0;
-	char			buffer[4096] = {0};
-
-	while (cmd.find(ENDLINE, 0) == std::string::npos)
-	{
-		std::cout << cmd.find(ENDLINE, 0) << std::endl;
-		ret += recv(this->_clientSd.at(i).fd, buffer + ret, sizeof(buffer), 0);
-		buffer[ret] = 0;
-		cmd = buffer;
-	}
+	char			buffer[512] = {0};
+  
+	cmd = this->_clients->at(i - 1).get_cmd();
+	ret = recv(this->_clientSd.at(i).fd, buffer, sizeof(buffer), 0);
+	buffer[ret] = 0;
+	cmd += buffer;
 	this->_clientSd.at(i).revents = 0;
-	return (cmd);
+	this->_clients->at(i - 1).set_cmd(cmd);
+	if (cmd.find(ENDLINE) != std::string::npos)
+		return 1;
+	else if (ret > 0 && !cmd.size())
+		return -1;
+	return 0;
 }
 
 void		ExecutionManager::IO_Operation()
 {
+	ssize_t						to_process;
 	ssize_t						ret;
-	std::string					cmd;
 	std::vector<std::string>	split_cmd;
 
 	for (int i = 1; i < this->_clientSd.size(); i++)
 	{
-		cmd = "";
-		cmd = recvCmd(i);
-		std::cout << "cmd == " << cmd << std::endl;
-		split_cmd = split(cmd, "\r\n");
-		if (!cmd.size() && this->_clientSd.at(i).events & POLLHUP)
+		to_process = this->recvCmd(i);
+		if (to_process == -1)
 		{
 			std::cout << "Client " << this->_clientSd.at(i).fd << " disconnected!" << std::endl;
 			command_quit(&this->_clients->at(i - 1), i);
 		}
-		else
+		else if (to_process)
 		{
+			split_cmd = split(_clients->at(i - 1).get_cmd(), "\r\n");
+			this->_clients->at(i - 1).set_cmd("");
 			for (std::vector<std::string>::iterator it = split_cmd.begin(); it != split_cmd.end(); ++it)
 			{
 				this->parseCmd(&this->_clients->at(i - 1), it->data(), i - 1);
 				this->sendRpl();
 			}
 		}
+		else 
+			continue;
 	}
 }

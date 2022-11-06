@@ -69,8 +69,6 @@ void	Server::run(ExecutionManager *exec)
 	while (!_shutdown)
 	{
 		signal(SIGINT, signalHandler);
-		/* if (_shutdown) */
-		/* 	break; */
 		events = exec->checkPoll();
 		if (events < 0 && !_shutdown)
 		{

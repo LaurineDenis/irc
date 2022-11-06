@@ -248,5 +248,3 @@ void			Channel::change_moderated(bool moderated)
 {
 	_moderated = moderated;
 }
-
-		

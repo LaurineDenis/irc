@@ -52,8 +52,8 @@ class	ExecutionManager {
 		void		dispatchCmd(Client *client, std::vector<std::string> line, int index, int cmd);
 		void		parseCmd(Client *client, std::string buffer, int index);
 		void		IO_Operation();
-		std::string		recvCmd(int i);
 		void	send_topic_reply(Client *client, Channel *channel);
+		ssize_t		recvCmd(int i);
 		bool	parse_channel_name(std::string channel_name);
 		void	command_pass(std::vector<std::string> out, Client *client);
 		void	command_cap(std::vector<std::string> out);
