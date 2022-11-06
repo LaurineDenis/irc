@@ -74,7 +74,6 @@ void		ExecutionManager::newConnection()
 	this->newClient(newSocket);
 	this->_clientSd.at(0).revents = 0;
 	this->_clientSd.at(this->_clientSd.size() - 1).revents = POLLIN;
-	std::cout << " Fin new connection " << std::endl;
 }
 
 void		ExecutionManager::deleteClient(int i)
@@ -86,15 +85,12 @@ void		ExecutionManager::deleteClient(int i)
 	/* } */
 	Client	*client = &this->_clients->at(i);
 	Channel	*channel;
-	std::cout << i << std::endl;
 	while (this->_clients->at(i)._channels->size())
 	{
-		std::cout << "|||||" << this->_clients->at(i)._channels->size() << std::endl;
 		channel = &this->_channels->at(0);
-		send_msg_to_channel_clients(":" + client->get_nickname() + "!" + client->get_nickname() + "@server PART #" + channel->get_name() + ENDLINE, client, channel);
+		send_msg_to_channel_clients(":" + client->get_nickname() + "!" + client->get_nickname() + "@server PART " + channel->get_name() + ENDLINE, client, channel);
 		remove_client_of_channel(channel, client);
 	}
-	std::cout << "wtf?????" << std::endl;
 	this->_clients->erase(this->_clients->cbegin() + i);
 	this->_clientSd.erase(this->_clientSd.cbegin() + i + 1);
 	/* close connection? */
@@ -189,7 +185,6 @@ void		ExecutionManager::dispatchCmd(Client *client, std::vector<std::string> lin
 			command_kick(line, client);
 			break;
 		case MODE :
-			std::cout << "Mide switch" << std::endl;
 			command_mode(line, client);
 			break;
 		case QUIT :
