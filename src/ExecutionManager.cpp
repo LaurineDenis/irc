@@ -148,6 +148,7 @@ void		ExecutionManager::parseCmd(Client *client, std::string buffer, int index)
 		std::cout << "Command not found cmd = " << cmd << std::endl;
 		//command not found
 	}
+	print_infos();
 }
 
 void		ExecutionManager::dispatchCmd(Client *client, std::vector<std::string> line, int index, int cmd)
