@@ -65,7 +65,7 @@ void	ExecutionManager::send_topic_reply(Client *client, Channel *channel)
 	client->answer += ":" + client->get_nickname() + "!" + client->get_nickname() + "@server JOIN " + channel->get_name() + ENDLINE;
 	if (channel->get_topic() != "")
 		client->answer += ":server 332 " +  client->get_name() + " #" + channel->get_name() + " :" + channel->get_topic() + ENDLINE + ":server 333 " +  client->get_name() + " " + channel->get_name() + " " + channel->get_topic_client() + " " + channel->get_topic_time() + ENDLINE;
-	if (channel->_clients->size() > 1)
+	if (channel->_clients->size() >= 1)
 	{
 		for (int i = 0; i < channel->_clients->size(); i++)
 		{
@@ -92,7 +92,7 @@ void	ExecutionManager::command_join(std::vector<std::string> line, Client *clien
 		std::string		str = it->data();
 		if (parse_channel_name(str))
 		{
-			if ((channel = find_channel(str.erase(0, 1))) == NULL)
+			if ((channel = find_channel(str)) == NULL)
 			{
 				//creer le channel si il existe pas correspondant puis add channel in server
 				channel = new Channel(client, it->data());
@@ -166,7 +166,7 @@ void	ExecutionManager::command_part(std::vector<std::string> out, Client *client
 
 	if (out[1][0] == '#')
 	{
-		channel_name = out[1].erase(0, 1);
+		channel_name = out[1];
 		if ((channel = find_channel(channel_name)) == NULL)
 		{
 			//Le channel n'existe pas => Pas de message d'erreurs ?
@@ -196,7 +196,7 @@ void	ExecutionManager::command_kick(std::vector<std::string> out, Client *client
 
 	if (out[1][0] == '#')
 	{
-		channel_name = out[1].erase(0, 1);
+		channel_name = out[1];
 		if ((channel = find_channel(channel_name)) == NULL)
 		{
 			//Le channel n'existe pas => Pas de message d'erreurs ?
