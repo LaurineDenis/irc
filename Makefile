@@ -1,7 +1,7 @@
 NAME		= ircserv
 OBJS		= $(SRCS:.cpp=.o)
 HEADER		= include/Command.hpp include/Client.hpp include/Server.hpp include/Channel.hpp include/Irc.hpp include/ExecutionManager.hpp
-SRCS		= src/Server.cpp src/Command.cpp src/Client.cpp src/Utils.cpp src/Channel.cpp src/Main.cpp src/CommandChannel.cpp src/CommandClient.cpp src/ExecutionManager.cpp
+SRCS		= src/Server.cpp src/Command.cpp src/Client.cpp src/Utils.cpp src/Channel.cpp src/Main.cpp src/CommandChannel.cpp src/CommandClient.cpp src/ExecutionManager.cpp src/CommandMode.cpp
 RM			= rm -f
 CC			= clang++
 CFLAGS		= -Wall -Werror -Wextra -std=c++98

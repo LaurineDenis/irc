@@ -19,6 +19,7 @@ enum	Command_lst
 	TOPIC,
 	KICK,
 	PING,
+	MODE,
 	QUIT
 };
 
@@ -51,6 +52,7 @@ class	ExecutionManager {
 		void		dispatchCmd(Client *client, std::vector<std::string> line, int index, int cmd);
 		void		parseCmd(Client *client, std::string buffer, int index);
 		void		IO_Operation();
+		void	send_topic_reply(Client *client, Channel *channel);
 		ssize_t		recvCmd(int i);
 		bool	parse_channel_name(std::string channel_name);
 		void	command_pass(std::vector<std::string> out, Client *client);
@@ -63,7 +65,14 @@ class	ExecutionManager {
 		void	command_part(std::vector<std::string> out, Client *client);
 		void	command_topic(std::vector<std::string> out, Client *client);
 		void	command_kick(std::vector<std::string> out, Client *client);
+		void	command_mode(std::vector<std::string> out, Client *user);
 		void	command_quit(Client *client, int index);
+		void	mode_invite(Client *client, Channel *channel, std::vector<std::string> line);
+		void	mode_topic(Client *client, Channel *channel, std::vector<std::string> line);
+		void	mode_operator(Client *client, Channel *channel, std::vector<std::string> line);
+		void	mode_moderated(Client *client, Channel *channel, std::vector<std::string> line);
+		void	mode_voice(Client *client, Channel *channel, std::vector<std::string> line);
+		void	mode_banned(Client *client, Channel *channel, std::vector<std::string> line);
 		void	change_topic(std::string topic, std::string client, Channel *channel);
 		void	send_msg_to_channel_clients(std::string msg, Client *client, Channel *channel);
 		void	send_msg_to_client(std::string msg, Client *other_client);
@@ -72,7 +81,6 @@ class	ExecutionManager {
 		Channel	*find_channel(std::string channel_name);
 		void	delete_channel(Channel *channel);
 		bool	check_nickname(std::string nickname);
-		bool	is_operator(Client *client, Channel *channel);
 		bool	is_register(Client *client);
 		int		is_command(std::vector<std::string> line);
 		void	remove_client_of_channel(Channel *channel, Client *client);

@@ -35,6 +35,7 @@ void		ExecutionManager::init_cmd()
 	_cmd_name->push_back("TOPIC");
 	_cmd_name->push_back("KICK");
 	_cmd_name->push_back("PING");
+	_cmd_name->push_back("MODE");
 	_cmd_name->push_back("QUIT");
 }
 
@@ -73,6 +74,7 @@ void		ExecutionManager::newConnection()
 	this->newClient(newSocket);
 	this->_clientSd.at(0).revents = 0;
 	this->_clientSd.at(this->_clientSd.size() - 1).revents = POLLIN;
+	std::cout << " Fin new connection " << std::endl;
 }
 
 void		ExecutionManager::deleteClient(int i)
@@ -186,6 +188,10 @@ void		ExecutionManager::dispatchCmd(Client *client, std::vector<std::string> lin
 		case KICK :
 			command_kick(line, client);
 			break;
+		case MODE :
+			std::cout << "Mide switch" << std::endl;
+			command_mode(line, client);
+			break;
 		case QUIT :
 			command_quit(client, index);
 			break;
@@ -224,7 +230,7 @@ ssize_t		ExecutionManager::recvCmd(int i)
 	std::string		cmd;
 	ssize_t			ret = 0;
 	char			buffer[512] = {0};
-
+  
 	cmd = this->_clients->at(i - 1).get_cmd();
 	ret = recv(this->_clientSd.at(i).fd, buffer, sizeof(buffer), 0);
 	buffer[ret] = 0;

@@ -17,6 +17,17 @@
 # include "Message.hpp"
 # include "Client.hpp"
 # include "ExecutionManager.hpp"
+// # include "Command/Cap.hpp"
+// # include "Command/Join.hpp"
+// # include "Command/Kick.hpp"
+// # include "Command/Nick.hpp"
+// # include "Command/Part.hpp"
+// # include "Command/Pass.hpp"
+// # include "Command/Ping.hpp"
+// # include "Command/Privmsg.hpp"
+// # include "Command/Quit.hpp"
+// # include "Command/Topic.hpp"
+// # include "Command/User.hpp"
 
 #define ENDLINE "\r\n"
 
