@@ -1,22 +1,19 @@
-// #ifndef USER_HPP
-//  #define USER_HPP
+#ifndef USER_HPP
+ #define USER_HPP
 
-//  #include <iostream>
-//  #include <string>
-//  #include <vector>
-//  #include "../Irc.hpp"
-//  #include "../Command.hpp"
+ #include <iostream>
+ #include <string>
+ #include <vector>
+ #include "Irc.hpp"
 
-//  class	Client : public Command
-// {
-// 	public:
+class	User
+{
+	public:
 
-// 		Client();
-// 		~Client();
+		User();
+		User(User const &cpy);
+		~User();
+		User					&operator=(User const &src);
+};
 
-// 	private:
-
-//        std::string  _args;
-// };
-
-// #endif
+#endif

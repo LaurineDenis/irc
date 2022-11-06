@@ -9,7 +9,7 @@ void	ExecutionManager::print_infos()
 		for (std::vector<Channel>::iterator it = _channels->begin(); it != _channels->end(); it++)
 		{
 			std::cout << "\t" << it->get_name() << std::endl;
-			std::cout << "\tOperator is : " << it->get_operator()->get_nickname() << std::endl;
+			std::cout << "\tCreator is : " << it->get_creator()->get_nickname() << std::endl;
 			if (!_channels->data()->_clients->empty())
 			{
 				std::cout << "\t\tClient in channel" << std::endl;
