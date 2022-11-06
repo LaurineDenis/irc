@@ -148,17 +148,15 @@ bool			Channel::remove_operator(Client *client)
 {
 	if (is_operator(client) == false)
 		return (false);
-	else
+	for (std::vector<Client>::iterator it = _operator->begin(); it != _operator->end(); ++it)
 	{
-		for (std::vector<Client>::iterator it = _operator->begin(); it != _operator->end(); ++it)
+		if (it->get_nickname() == client->get_nickname())
 		{
-			if (it->get_nickname() == client->get_nickname())
-			{
-				_operator->erase(it);
-				return (true);
-			}
+			_operator->erase(it);
+			return (true);
 		}
 	}
+	return (false);
 }
 
 bool			Channel::is_operator(Client *client)
