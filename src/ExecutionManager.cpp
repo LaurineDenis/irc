@@ -91,7 +91,7 @@ void		ExecutionManager::deleteClient(int i)
 	{
 		std::cout << "|||||" << this->_clients->at(i)._channels->size() << std::endl;
 		channel = &this->_channels->at(0);
-		send_msg_to_channel_clients(":" + client->get_nickname() + "!" + client->get_nickname() + "@server PART #" + channel->get_name() + ENDLINE, client, channel);
+		send_msg_to_channel_clients(":" + client->get_nickname() + "!" + client->get_nickname() + "@server PART " + channel->get_name() + ENDLINE, client, channel);
 		remove_client_of_channel(channel, client);
 	}
 	std::cout << "wtf?????" << std::endl;
@@ -152,6 +152,7 @@ void		ExecutionManager::parseCmd(Client *client, std::string buffer, int index)
 		std::cout << "Command not found cmd = " << cmd << std::endl;
 		//command not found
 	}
+	print_infos();
 }
 
 void		ExecutionManager::dispatchCmd(Client *client, std::vector<std::string> line, int index, int cmd)
