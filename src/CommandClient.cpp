@@ -14,6 +14,7 @@ void	ExecutionManager::command_nick(std::vector<std::string> out, Client *client
 {
 	std::string		old_nick;
 	std::cout << "command Nick" << std::endl;
+	client->_nick = 1;
 	old_nick = client->get_nickname();
 	if (check_nickname(out[1]))
 	{
@@ -64,6 +65,12 @@ bool	ExecutionManager::check_nickname(std::string nickname)
 
 void	ExecutionManager::command_client(std::vector<std::string> out, Client *client)
 {
+	if (client->_user)
+	{
+		// ERROR REGISTRATION
+		return;
+	}
+	client->_user = 1;
 	std::cout << "command Client" << std::endl;
 	client->set_name(out[1]);
 	if (client->get_nickname().size() != 0 && !client->wlcm_send)
