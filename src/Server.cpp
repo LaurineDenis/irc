@@ -66,6 +66,10 @@ void	Server::run(ExecutionManager *exec)
 {
 	int		events;
 
+	std::cout << PASS << std::endl;
+	std::cout << USER << std::endl;
+	std::cout << NICK << std::endl;
+	std::cout << CAP << std::endl;
 	while (!_shutdown)
 	{
 		signal(SIGINT, signalHandler);

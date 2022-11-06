@@ -7,18 +7,18 @@ class	Client;
 class	Channel;
 class	Server;
 
-enum	Command_lst
+ enum	Command_list
 {
 	PASS,
-	NICK,
-	USER,
 	CAP,
+	USER,
+	NICK,
+	PING,
 	JOIN,
 	PRIVMSG,
 	PART,
 	TOPIC,
 	KICK,
-	PING,
 	MODE,
 	QUIT
 };

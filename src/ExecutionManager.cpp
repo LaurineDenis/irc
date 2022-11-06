@@ -26,15 +26,15 @@ void		ExecutionManager::init_cmd()
 {
 	this->_cmd_name = new std::vector<std::string>;
 	_cmd_name->push_back("PASS");
-	_cmd_name->push_back("NICK");
-	_cmd_name->push_back("USER");
 	_cmd_name->push_back("CAP");
+	_cmd_name->push_back("USER");
+	_cmd_name->push_back("NICK");
+	_cmd_name->push_back("PING");
 	_cmd_name->push_back("JOIN");
 	_cmd_name->push_back("PRIVMSG");
 	_cmd_name->push_back("PART");
 	_cmd_name->push_back("TOPIC");
 	_cmd_name->push_back("KICK");
-	_cmd_name->push_back("PING");
 	_cmd_name->push_back("MODE");
 	_cmd_name->push_back("QUIT");
 }
@@ -74,7 +74,6 @@ void		ExecutionManager::newConnection()
 	this->newClient(newSocket);
 	this->_clientSd.at(0).revents = 0;
 	this->_clientSd.at(this->_clientSd.size() - 1).revents = POLLIN;
-	std::cout << " Fin new connection " << std::endl;
 }
 
 void		ExecutionManager::deleteClient(int i)
@@ -86,15 +85,12 @@ void		ExecutionManager::deleteClient(int i)
 	/* } */
 	Client	*client = &this->_clients->at(i);
 	Channel	*channel;
-	std::cout << i << std::endl;
 	while (this->_clients->at(i)._channels->size())
 	{
-		std::cout << "|||||" << this->_clients->at(i)._channels->size() << std::endl;
 		channel = &this->_channels->at(0);
 		send_msg_to_channel_clients(":" + client->get_nickname() + "!" + client->get_nickname() + "@server PART " + channel->get_name() + ENDLINE, client, channel);
 		remove_client_of_channel(channel, client);
 	}
-	std::cout << "wtf?????" << std::endl;
 	this->_clients->erase(this->_clients->cbegin() + i);
 	this->_clientSd.erase(this->_clientSd.cbegin() + i + 1);
 	/* close connection? */
@@ -111,14 +107,6 @@ int			ExecutionManager::is_command(std::vector<std::string> line)
 	return (-1);
 }
 
-bool		ExecutionManager::is_register(Client *client)
-{
-	if (client->get_name().size() != 0 && client->get_nickname().size() != 0 && _password.size() != 0)
-		return (true);
-	return (false);
-}
-
-
 void		ExecutionManager::parseCmd(Client *client, std::string buffer, int index)
 {
 	std::vector<std::string>	line = split(buffer, " \r\n");
@@ -129,34 +117,24 @@ void		ExecutionManager::parseCmd(Client *client, std::string buffer, int index)
 	/* 	std::cout << "|" << *it << "|" << std::endl; */
 	if ((cmd = is_command(line)) >= 0)
 	{
-		if (is_register(client))
-		{
-			dispatchCmd(client, line, index, cmd);
-		}
-		else
-		{
-			if (line[0] == "PASS" || line[0] == "NICK" || line[0] == "USER" || line[0] == "CAP")
-			{
-				dispatchCmd(client, line, index, cmd);
-				//send welcome si les 3 oui ici ou laisser dans les fonction ?
-			}
-			else
-			{
-				std::cout << "Not connected" << std::endl;
-				//your not connected
-			}
-		}
+		dispatchCmd(client, line, index, cmd);
 	}
 	else
 	{
 		std::cout << "Command not found cmd = " << cmd << std::endl;
 		//command not found
 	}
-	print_infos();
+	/* print_infos(); */
 }
 
 void		ExecutionManager::dispatchCmd(Client *client, std::vector<std::string> line, int index, int cmd)
 {
+	std::cout << cmd << std::endl;
+	if (!client->is_register(cmd))
+	{
+		std::cout << "registration error mamene" << std::endl;
+		return;
+	}
 	switch (cmd)
 	{
 		case PASS :
@@ -165,14 +143,14 @@ void		ExecutionManager::dispatchCmd(Client *client, std::vector<std::string> lin
 		case CAP :
 			command_cap(line);
 			break;
-		case PING :
-			command_ping(line);
+		case USER :
+			command_client(line, client);
 			break;
 		case NICK :
 			command_nick(line, client);
 			break;
-		case USER :
-			command_client(line, client);
+		case PING :
+			command_ping(line);
 			break;
 		case JOIN :
 			command_join(line, client);
@@ -190,7 +168,6 @@ void		ExecutionManager::dispatchCmd(Client *client, std::vector<std::string> lin
 			command_kick(line, client);
 			break;
 		case MODE :
-			std::cout << "Mide switch" << std::endl;
 			command_mode(line, client);
 			break;
 		case QUIT :
