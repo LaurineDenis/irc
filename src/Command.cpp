@@ -87,7 +87,7 @@ void	ExecutionManager::command_privmsg(std::vector<std::string> out, Client *use
 	//channel case
 	if (out[1][0] == '#')
 	{
-		channel_name = out[1].erase(0, 1);
+		channel_name = out[1];
 		if ((channel = find_channel(channel_name)) == NULL)
 		{
 			//Le channel n'existe pas
@@ -97,7 +97,7 @@ void	ExecutionManager::command_privmsg(std::vector<std::string> out, Client *use
 		{
 			for (int i = 2; i < out.size(); i++)
 				msg += " " + out[i];
-			send_msg_to_channel_clients(":" + user->get_nickname() + "!" + user->get_name() + "@server PRIVMSG #" + channel->get_name() + " " + msg + ENDLINE, user, channel);
+			send_msg_to_channel_clients(":" + user->get_nickname() + "!" + user->get_name() + "@server PRIVMSG " + channel->get_name() + " " + msg + ENDLINE, user, channel);
 		}
 	}
 	else if((other_user = find_client(out[1])) != NULL)

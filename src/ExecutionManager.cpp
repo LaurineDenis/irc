@@ -36,6 +36,7 @@ void		ExecutionManager::init_cmd()
 	_cmd_name->push_back("TOPIC");
 	_cmd_name->push_back("KICK");
 	_cmd_name->push_back("MODE");
+	_cmd_name->push_back("INVITE");
 	_cmd_name->push_back("QUIT");
 }
 
@@ -129,7 +130,6 @@ void		ExecutionManager::parseCmd(Client *client, std::string buffer, int index)
 		std::cout << "Command not found cmd = " << cmd << std::endl;
 		//command not found
 	}
-	/* print_infos(); */
 }
 
 void		ExecutionManager::dispatchCmd(Client *client, std::vector<std::string> line, int index, int cmd)
@@ -174,6 +174,9 @@ void		ExecutionManager::dispatchCmd(Client *client, std::vector<std::string> lin
 			break;
 		case MODE :
 			command_mode(line, client);
+			break;
+		case INVITE :
+			command_invite(line, client);
 			break;
 		case QUIT :
 			command_quit(client, index);
@@ -247,6 +250,7 @@ void		ExecutionManager::IO_Operation()
 			this->_clients->at(i - 1).set_cmd("");
 			for (std::vector<std::string>::iterator it = split_cmd.begin(); it != split_cmd.end(); ++it)
 			{
+				std::cout << "CMD = |" << it->data() << "|" << std::endl;
 				this->parseCmd(&this->_clients->at(i - 1), it->data(), i - 1);
 				this->sendRpl();
 			}

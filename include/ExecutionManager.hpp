@@ -20,6 +20,7 @@ class	Server;
 	TOPIC,
 	KICK,
 	MODE,
+	INVITE,
 	QUIT
 };
 
@@ -54,6 +55,8 @@ class	ExecutionManager {
 		void		IO_Operation();
 		void	send_topic_reply(Client *client, Channel *channel);
 		ssize_t		recvCmd(int i);
+		bool	check_right_channel(Channel *channel, Client *client);
+		//command
 		std::vector<std::string>	parse_channel_name(std::vector<std::string> channel_name);
 		void	command_pass(std::vector<std::string> out, Client *client);
 		void	command_cap(std::vector<std::string> out);
@@ -66,7 +69,11 @@ class	ExecutionManager {
 		void	command_topic(std::vector<std::string> out, Client *client);
 		void	command_kick(std::vector<std::string> out, Client *client);
 		void	command_mode(std::vector<std::string> out, Client *user);
+		void	command_invite(std::vector<std::string> out, Client *user);
 		void	command_quit(Client *client, int index);
+		//mode
+		void	select_mode(Client *client, Channel *channel, std::vector<std::string> line, std::size_t pos);
+		void	check_mode(Client *client, Channel *channel, std::vector<std::string> line);
 		void	mode_invite(Client *client, Channel *channel, std::vector<std::string> line);
 		void	mode_topic(Client *client, Channel *channel, std::vector<std::string> line);
 		void	mode_operator(Client *client, Channel *channel, std::vector<std::string> line);
