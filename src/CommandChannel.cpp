@@ -221,9 +221,9 @@ void	ExecutionManager::command_part(std::vector<std::string> out, Client *client
 		else
 		{
 			client->answer += ":" + client->get_nickname() + "!" + client->get_name() + "@server PART " + channel->get_name() + ENDLINE;
-			remove_client_of_channel(channel, client);
 			std::cout << "send = " << client->answer << std::endl;
 			send_msg_to_channel_clients(":" + client->get_nickname() + "!" + client->get_nickname() + "@server PART " + channel->get_name() + ENDLINE, client, channel);
+			remove_client_of_channel(channel, client);
 		}
 	}
 }
