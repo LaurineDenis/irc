@@ -5,11 +5,8 @@
 void	ExecutionManager::change_topic(std::string topic, std::string client, Channel *channel)
 {
 	time_t	rawtime;
-	struct	tm *timeinfo;
 
 	time(&rawtime);
-	std::cout << ctime(&rawtime) << std::endl;
-	std::cout << rawtime << std::endl;
 	channel->set_topic(topic);
 	channel->set_topic_client(client);
 	channel->set_topic_time(std::to_string(rawtime));
@@ -132,6 +129,8 @@ void	ExecutionManager::command_join(std::vector<std::string> line, Client *clien
 	Channel						*channel;
 	std::string					msg;
 	std::vector<std::string>	channel_names;
+	time_t						rawtime;
+
 
 	line.resize(2);
 	channel_names = parse_channel_name(line);
@@ -139,6 +138,9 @@ void	ExecutionManager::command_join(std::vector<std::string> line, Client *clien
 	{
 		if (check_right_channel(channel_names.at(i), client) == true)
 		{
+			time(&rawtime);
+			channel = new Channel(client, channel_names.at(i), std::to_string(rawtime));
+			_channels->push_back(*channel);
 			if ((channel = find_channel(channel_names.at(i))) == NULL)
 			{
 				channel = new Channel(client, channel_names.at(i));

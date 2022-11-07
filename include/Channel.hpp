@@ -11,7 +11,7 @@ class	Channel
 
 		Channel();
 		Channel(Channel const &cpy);
-		Channel(Client *creator, std::string name);
+		Channel(Client *creator, std::string name, std::string time);
 		Channel		&operator=(Channel const &cpy);
 		~Channel();
 		std::string				get_name();
@@ -19,11 +19,13 @@ class	Channel
 		std::string				get_topic_client();
 		std::string				get_topic_time();
 		Client					*get_creator();
+		std::string		get_time();
 		void					set_name(std::string name);
 		void					set_topic(std::string topic);
 		void					set_topic_client(std::string topic_client);
 		void					set_topic_time(std::string topic_time);
 		void					set_creator(Client *client);
+		void					set_time(std::string time);
 		bool					add_operator(Client *client);
 		bool					remove_operator(Client *client);
 		bool					is_operator(Client *client);
@@ -59,6 +61,7 @@ class	Channel
 		bool					_invite_only;
 		bool					_mode_topic;
 		bool					_moderated;
+		std::string		_time;
 };
 
 #endif
