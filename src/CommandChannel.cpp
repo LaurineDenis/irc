@@ -4,7 +4,7 @@ void	ExecutionManager::change_topic(std::string topic, std::string client, Chann
 {
 	// char			time_test[300];
 	time_t	timestamp = time( NULL );
-    // struct tm * pTime = localtime( & timestamp );
+	// struct tm * pTime = localtime( & timestamp );
 	// strftime(time_test, 300, "%a, %d %h %G %T", pTime);
 	// std::string		time_string;
 	channel->set_topic(topic);
@@ -110,27 +110,29 @@ bool	ExecutionManager::check_right_channel(Channel *channel, Client *client)
 
 void	ExecutionManager::command_join(std::vector<std::string> line, Client *client)
 {
-	Channel				*channel;
-	std::string			msg;
+	Channel						*channel;
+	std::string					msg;
+	std::vector<std::string>	channel_names;
 
 	//Affichage
-	for (std::vector<std::string>::iterator it = line.begin(); it != line.end(); ++it)
-		std::cout << "|" << *it << "|" << std::endl;
-	for (std::vector<std::string>::iterator it = line.begin()+1; it != line.end(); ++it)
+	/* for (std::vector<std::string>::iterator it = line.begin(); it != line.end(); ++it) */
+	/* 	std::cout << "|" << *it << "|" << std::endl; */
+	line.resize(2);
+	channel_names = parse_channel_name(line);
+	for (int i = 0; i < channel_names.size(); i++)
 	{
-		std::string		str = it->data();
-				if ((channel = find_channel(str)) == NULL)
-				{
-					//creer le channel si il existe pas correspondant puis add channel in server
-					channel = new Channel(client, it->data());
-					_channels->push_back(*channel);
-				}
-				else if (!check_right_channel(channel, client))
-					break ;
-				add_channel_in_client(channel, client);
-				send_topic_reply(client, channel);
-				send_msg_to_channel_clients(":" + client->get_nickname() + "!" + client->get_nickname() + "@server JOIN " + channel->get_name() + ENDLINE, client, channel);
+		if ((channel = find_channel(channel_names.at(i))) == NULL)
+		{
+			//creer le channel si il existe pas correspondant puis add channel in server
+			channel = new Channel(client, channel_names.at(i));
+			_channels->push_back(*channel);
 		}
+		else if (!check_right_channel(channel, client))
+			break ;
+		add_channel_in_client(channel, client);
+		send_topic_reply(client, channel);
+		send_msg_to_channel_clients(":" + client->get_nickname() + "!" + client->get_nickname() + "@server JOIN " + channel->get_name() + ENDLINE, client, channel);
+	}
 }
 
 bool	is_in_channel(Channel *channel, Client *client)

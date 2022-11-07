@@ -118,11 +118,11 @@ void		ExecutionManager::parseCmd(Client *client, std::string buffer, int index)
 	/* 	std::cout << "|" << *it << "|" << std::endl; */
 	if ((cmd = is_command(line)) >= 0)
 	{
-		if (cmd == JOIN || cmd == PART)
-		{
-			line.resize(2);
-			parse_channel_name(line);
-		}
+		/* if (cmd == JOIN || cmd == PART) */
+		/* { */
+		/* 	line.resize(2); */
+		/* 	parse_channel_name(line); */
+		/* } */
 		dispatchCmd(client, line, index, cmd);
 	}
 	else
