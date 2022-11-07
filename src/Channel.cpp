@@ -114,25 +114,37 @@ void			Channel::set_creator(Client *client)
 	_creator = client;
 }
 
-void			Channel::change_banned(Client *client)
+bool			Channel::add_banned(Client *client)
+{
+	if (is_banned(client) == true)
+		return (false);
+	_banned->push_back(*client);
+	return (true);
+}
+
+bool			Channel::remove_banned(Client *client)
 {
 	if (is_banned(client) == false)
-		_banned->push_back(*client);
-	else
+		return (false);
+	for (std::vector<Client>::iterator it = _banned->begin(); it != _banned->end(); ++it)
 	{
-		for (std::vector<Client>::iterator it = _banned->begin(); it != _banned->end(); ++it)
+		if (it->get_nickname() == client->get_nickname())
 		{
-			if (it->get_nickname() == client->get_nickname())
-				_banned->erase(it);
+			_banned->erase(it);
+			return (true);
 		}
 	}
+	return (false);
 }
 
 bool			Channel::is_banned(Client *client)
 {
 	for (std::vector<Client>::iterator ite = _banned->begin(); ite != _banned->end(); ite++)
+	{
+		std::cout << "Banned = " << ite->get_nickname() << std::endl;
 		if (ite->get_nickname() == client->get_nickname())
 			return (true) ;
+	}
 	return (false);
 }
 
@@ -167,18 +179,27 @@ bool			Channel::is_operator(Client *client)
 	return (false);
 }
 
-void			Channel::change_invite(Client *client)
+bool			Channel::add_invited(Client *client)
+{
+	if (is_invited(client) == true)
+		return (false);
+	_invited->push_back(*client);
+	return (true);
+}
+
+bool			Channel::remove_invited(Client *client)
 {
 	if (is_invited(client) == false)
-		_invited->push_back(*client);
-	else
+		return (false);
+	for (std::vector<Client>::iterator it = _invited->begin(); it != _invited->end(); ++it)
 	{
-		for (std::vector<Client>::iterator it = _invited->begin(); it != _invited->end(); ++it)
+		if (it->get_nickname() == client->get_nickname())
 		{
-			if (it->get_nickname() == client->get_nickname())
-				_invited->erase(it);
+			_invited->erase(it);
+			return (true);
 		}
 	}
+	return (false);
 }
 
 bool			Channel::is_invited(Client *client)
@@ -189,18 +210,27 @@ bool			Channel::is_invited(Client *client)
 	return (false);
 }
 
-void			Channel::change_voice(Client *client)
+bool			Channel::add_voice_ok(Client *client)
+{
+	if (is_voice_ok(client) == true)
+		return (false);
+	_voice_ok->push_back(*client);
+	return (true);
+}
+
+bool			Channel::remove_voice_ok(Client *client)
 {
 	if (is_voice_ok(client) == false)
-		_voice_ok->push_back(*client);
-	else
+		return (false);
+	for (std::vector<Client>::iterator it = _voice_ok->begin(); it != _voice_ok->end(); ++it)
 	{
-		for (std::vector<Client>::iterator it = _voice_ok->begin(); it != _voice_ok->end(); ++it)
+		if (it->get_nickname() == client->get_nickname())
 		{
-			if (it->get_nickname() == client->get_nickname())
-				_voice_ok->erase(it);
+			_voice_ok->erase(it);
+			return (true);
 		}
 	}
+	return (false);
 }
 
 bool			Channel::is_voice_ok(Client *client)

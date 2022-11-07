@@ -27,11 +27,14 @@ class	Channel
 		bool					add_operator(Client *client);
 		bool					remove_operator(Client *client);
 		bool					is_operator(Client *client);
-		void					change_banned(Client *client);
+		bool					add_banned(Client *client);
+		bool					remove_banned(Client *client);
 		bool					is_banned(Client *client);
-		void					change_invite(Client *client);
+		bool					add_invited(Client *client);
+		bool					remove_invited(Client *client);
 		bool					is_invited(Client *client);
-		void					change_voice(Client *client);
+		bool					add_voice_ok(Client *client);
+		bool					remove_voice_ok(Client *client);
 		bool					is_voice_ok(Client *client);
 		bool					is_invite_only();
 		bool					is_mode_topic();
