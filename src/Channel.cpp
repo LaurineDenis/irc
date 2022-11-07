@@ -287,3 +287,14 @@ void			Channel::change_moderated(bool moderated)
 {
 	_moderated = moderated;
 }
+
+std::string		Channel::list_banned(std::string name)
+{
+	std::string	msg;
+
+	for (std::vector<Client>::iterator is_ban = _banned->begin(); is_ban < _banned->end(); is_ban++)
+	{
+		msg += "367 " + name + " " + get_name() + " " + is_ban->get_nickname() + " " + ENDLINE;
+	}
+	return (msg);
+}

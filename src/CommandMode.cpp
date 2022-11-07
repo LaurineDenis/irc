@@ -20,17 +20,17 @@ void	ExecutionManager::command_mode(std::vector<std::string> line, Client *clien
 			std::string		mode = "itomvb";
 			std::size_t		pos;
 			str = (line.begin()+2)->data();
-			if ((pos = mode.find_first_of(str[1], 0)) != std::string::npos)
+			if (check_mode(client, channel, line) == true)
 			{
-				std::cout << "pos find = " << pos << " corresponding to = " << str[pos] << std::endl;
-				//check si client est operator et donc a le droit de faire les modes
-				if (channel->is_operator(client) == true)
+				if ((pos = mode.find_first_of(str[1], 0)) != std::string::npos)
 				{
+					std::cout << "pos find = " << pos << " corresponding to = " << str[pos] << std::endl;
+					//check si client est operator et donc a le droit de faire les modes
 					select_mode(client, channel, line, pos);
 				}
+				else
+					client->answer = ":server 472 " + str + " :is unknown mode char to me for " + channel->get_name() + ENDLINE;
 			}
-			else
-				client->answer = ":server 472 " + str.erase(0, 1) + " :is unknown mode char to me for <channel>" + ENDLINE;
 		}
 }
 
@@ -43,46 +43,97 @@ void	ExecutionManager::select_mode(Client *client, Channel *channel, std::vector
 	(this->*function[pos])(client, channel, line);
 }
 
+bool	ExecutionManager::check_mode(Client *client, Channel *channel, std::vector<std::string> line)
+{
+	Client	*other_client;
+	
+	std::cout << "Size mode = " << line.size() << std::endl;
+	if (is_in_channel(channel, client))
+	{
+		if (line.size() >= 3)
+		{
+			if (channel->is_operator(client))
+			{
+				if (line.at(2).at(0) == '+' || line.at(2).at(0) == '-')
+				{
+					if (line.size() >= 4 && (line.at(2).at(1) == 'o' || line.at(2).at(1) == 'v' || line.at(2).at(1) == 'b'))
+					{
+						if ((other_client = find_client(line.at(3))) != NULL && (is_in_channel(channel, other_client) || line.at(2).at(1) == 'b'))
+							return (true);
+						else
+							client->answer += ":server 441 " + client->get_nickname() + " " + channel->get_name() + " :They aren't on that channel" + ENDLINE;
+					}
+					else if (line.at(2).at(1) == 'o' || line.at(2).at(1) == 'v')
+						client->answer += ":server 461 " + channel->get_name() + " :Not enough parameters" + ENDLINE;
+					else
+						return (true);
+				}
+				else
+					client->answer += ":server 472 " + line.at(2) + " :is unknown mode char to me for " + channel->get_name() + ENDLINE;
+			}
+			else
+				client->answer += ":server 482 " + channel->get_name() + " :You're not channel operator" + ENDLINE;
+		}
+		else
+		{
+			std::string	msg;
+			msg += "+";
+			if (channel->is_invite_only())
+				msg += "i";
+			if (channel->is_moderated())
+				msg += "m";
+			if (channel->is_mode_topic())
+				msg += "t";
+			client->answer += ":server 324 " + client->get_nickname() + " " + channel->get_name() + " " + msg + ENDLINE;
+		}
+	}
+	else
+		client->answer += ":server 441 " + client->get_nickname() + " " + channel->get_name() + " :They aren't on that channel" + ENDLINE;
+	return (false);
+}
+
 void	ExecutionManager::mode_invite(Client *client, Channel *channel, std::vector<std::string> line)
 {
 	std::cout << "Mode Invite" << std::endl;
     if (line.at(2).at(0) == '+')
+	{
         channel->change_invite_only(true);
+		send_msg_to_all_clients_of_channel(":" + client->get_nickname() +" MODE " + channel->get_name() + " +i" + ENDLINE, client, channel);
+	}
     else if (line.at(2).at(0) == '-')
+	{
         channel->change_invite_only(false);
-    else
-        std::cout << "Erreur parsing Mode" <<std::endl;
-	client->answer = ":server 324 " + channel->get_name() + " +i" + ENDLINE;
+		send_msg_to_all_clients_of_channel(":" + client->get_nickname() +" MODE " + channel->get_name() + " -i" + ENDLINE, client, channel);
+	}
 }
 
 void	ExecutionManager::mode_topic(Client *client, Channel *channel, std::vector<std::string> line)
 {
 	std::cout << "Mode Topic" << std::endl;
     if (line.at(2).at(0) == '+')
+	{
         channel->change_mode_topic(true);
+		send_msg_to_all_clients_of_channel(":" + client->get_nickname() + " MODE " + channel->get_name() + " +t" + ENDLINE, client, channel);
+	}
     else if (line.at(2).at(0) == '-')
+	{
         channel->change_mode_topic(false);
-    else
-        std::cout << "Erreur parsing Mode" <<std::endl;
-	client->answer = ":server 324 " + channel->get_name() + " +t" + ENDLINE;
+		send_msg_to_all_clients_of_channel(":" + client->get_nickname() + " MODE " + channel->get_name() + " -t" + ENDLINE, client, channel);
+	}
 }
 
 void	ExecutionManager::mode_moderated(Client *client, Channel *channel, std::vector<std::string> line)
 {
 	std::cout << "Mode Moderated" << std::endl;
     if (line.at(2).at(0) == '+')
-        channel->change_moderated(true);
-    else if (line.at(2).at(0) == '-')
-        channel->change_moderated(false);
-    else
-        std::cout << "Erreur parsing Mode" <<std::endl;
-	client->answer = ":server 324 " + channel->get_name() + " +m" + ENDLINE;
-}
-
-void	ExecutionManager::check_mode(Client *client, Channel *channel, std::vector<std::string> line)
-{
-	if (line.at(0).at(1) == '+' || line.at(0).at(1) == '-')
 	{
+        channel->change_moderated(true);
+		send_msg_to_all_clients_of_channel(":" + client->get_nickname() +" MODE " + channel->get_name() + " +m" + ENDLINE, client, channel);
+	}
+    else if (line.at(2).at(0) == '-')
+	{
+        channel->change_moderated(false);
+		send_msg_to_all_clients_of_channel(":" + client->get_nickname() +" MODE " + channel->get_name() + " -m" + ENDLINE, client, channel);
 	}
 }
 
@@ -93,41 +144,18 @@ void	ExecutionManager::mode_operator(Client *client, Channel *channel, std::vect
 
     if (line.at(2).at(0) == '+')
     {
-        if ((other_client = find_client(line.at(3).data())) != NULL)
-		{
-			if (is_in_channel(channel, client) == true)
-			{
-	            channel->add_operator(other_client);
-				client->answer += ":server 324 " + channel->get_name() + " +o " + other_client->get_nickname() + ENDLINE;
-			}
-			else
-				client->answer += ":server 441 " + client->get_nickname() + " " + channel->get_name() + " :They aren't on that channel" + ENDLINE;
-		}
-		else
-			std::cout << "This client doesn't exist" << std::endl;
+        other_client = find_client(line.at(3).data());
+	    channel->add_operator(other_client);
+		send_msg_to_all_clients_of_channel(":" + client->get_nickname() +" MODE " + channel->get_name() + " +o " + other_client->get_nickname() + ENDLINE, client, channel);
     }
     else if (line.at(2).at(0) == '-')
     {
-		if ((other_client = find_client(line.at(3).data())) != NULL)
-		{
-			if (is_in_channel(channel, client) == true)
-			{
-				if (channel->is_operator(client) == true)
-	            {
-					channel->remove_operator(other_client);
-					client->answer += ":server 324 " + channel->get_name() + " -o " + other_client->get_nickname() + ENDLINE;
-				}
-				else
-					std::cout << "This client is not an operator" << std::endl;
-			}
-			else
-				client->answer += ":server 441 " + client->get_nickname() + " " + channel->get_name() + " :They aren't on that channel" + ENDLINE;
-		}
-		else
-			std::cout << "This client doesn't exist" << std::endl;
+		other_client = find_client(line.at(3).data());
+		channel->remove_operator(other_client);
+		send_msg_to_all_clients_of_channel(":" + client->get_nickname() +" MODE " + channel->get_name() + " +o " + other_client->get_nickname() + ENDLINE, client, channel);
 	}
-    else
-        std::cout << "Erreur parsing Mode" <<std::endl;
+	send_list_name_channel(client, channel);
+	send_list_name_channel(other_client, channel);
 }
 
 void	ExecutionManager::mode_voice(Client *client, Channel *channel, std::vector<std::string> line)
@@ -137,35 +165,18 @@ void	ExecutionManager::mode_voice(Client *client, Channel *channel, std::vector<
 
     if (line.at(2).at(0) == '+')
     {
-        if ((other_client = find_client(line.at(3).data())) != NULL)
-		{
-			if (is_in_channel(channel, client) == true)
-	            channel->add_voice_ok(other_client);
-			else
-				client->answer += ":server 441 " + client->get_nickname() + " " + channel->get_name() + " :They aren't on that channel" + ENDLINE;
-		}
-		else
-			std::cout << "This client doesn't exist" << std::endl;
+        other_client = find_client(line.at(3).data());
+        channel->add_voice_ok(other_client);
+		client->answer += ":" + client->get_nickname() +" MODE " + channel->get_name() + " +v " + other_client->get_nickname() + ENDLINE;
+		other_client->answer += ":" + client->get_nickname() +" MODE " + channel->get_name() + " +v " + other_client->get_nickname() + ENDLINE;
     }
     else if (line.at(2).at(0) == '-')
     {
-		if ((other_client = find_client(line.at(3).data())) != NULL)
-		{
-			if (is_in_channel(channel, client) == true)
-			{
-				if (channel->is_voice_ok(client) == true)
-	            	channel->remove_voice_ok(other_client);
-				else
-					std::cout << "This client has not voice ok" << std::endl;
-			}
-			else
-				client->answer += ":server 441 " + client->get_nickname() + " " + channel->get_name() + " :They aren't on that channel" + ENDLINE;
-		}
-		else
-			std::cout << "This client doesn't exist" << std::endl;
+		other_client = find_client(line.at(3).data());
+		channel->remove_voice_ok(other_client);
+		client->answer += ":" + client->get_nickname() +" MODE " + channel->get_name() + " -v " + other_client->get_nickname() + ENDLINE;
+		other_client->answer += ":" + client->get_nickname() +" MODE " + channel->get_name() + " -v " + other_client->get_nickname() + ENDLINE;
 	}
-    else
-        std::cout << "Erreur parsing Mode" <<std::endl;
 }
 
 void	ExecutionManager::mode_banned(Client *client, Channel *channel, std::vector<std::string> line)
@@ -177,45 +188,22 @@ void	ExecutionManager::mode_banned(Client *client, Channel *channel, std::vector
 	{
 		if (line.at(2).at(0) == '+')
 		{
-			if ((other_client = find_client(line.at(3).data())) != NULL)
-			{
-				if (is_in_channel(channel, client) == true)
-				{
-					channel->add_banned(other_client);
-					client->answer += ":server 324 " + channel->get_name() + " +b " + other_client->get_nickname() + ENDLINE;
-				}
-				else
-					client->answer += ":server 441 " + client->get_nickname() + " " + channel->get_name() + " :They aren't on that channel" + ENDLINE;
-			}
-			else
-				std::cout << "This client doesn't exist" << std::endl;
+			other_client = find_client(line.at(3).data());
+			channel->add_banned(other_client);
+			client->answer += ":" + client->get_nickname() +" MODE " + channel->get_name() + " +b " + other_client->get_nickname() + ENDLINE;
 		}
 		else if (line.at(2).at(0) == '-')
 		{
-			if ((other_client = find_client(line.at(3).data())) != NULL)
-			{
-				if (is_in_channel(channel, client) == true)
-				{
-					if (channel->is_banned(other_client) == true)
-					{
-						channel->remove_banned(other_client);
-						client->answer += ":server 324 " + channel->get_name() + " -b " + other_client->get_nickname() + ENDLINE;
-					}
-					else
-						std::cout << "This client is not banned" << std::endl;
-				}
-				else
-					client->answer += ":server 441 " + client->get_nickname() + " " + channel->get_name() + " :They aren't on that channel" + ENDLINE;
-			}
-			else
-				std::cout << "This client doesn't exist" << std::endl;
+			other_client = find_client(line.at(3).data());
+			channel->remove_banned(other_client);
+			client->answer += ":" + client->get_nickname() +" MODE " + channel->get_name() + " -b " + other_client->get_nickname() + ENDLINE;
 		}
-		else
-			std::cout << "Erreur parsing Mode" <<std::endl;
 	}
-	else if (line.size() == 2)
+	else if (line.size() == 3)
 	{
-		//list banned people
+		std::string	msg;
+		msg = channel->list_banned(client->get_nickname());
+		client->answer += ":server " + msg + "368 " + client->get_nickname() + " " + channel->get_name() + " :End of channel ban list" + ENDLINE;
 	}
 	else
 		client->answer += ":server 461 " + line.at(0) + " :Not enough parameters" + ENDLINE;

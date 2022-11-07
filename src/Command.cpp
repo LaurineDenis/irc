@@ -39,16 +39,24 @@ void	ExecutionManager::print_infos()
 
 void	ExecutionManager::send_msg_to_channel_clients(std::string msg, Client *user, Channel *channel)
 {
-	for (std::vector<Client>::iterator it = _clients->begin(); it != _clients->end(); it++)
+	for (std::vector<Client>::iterator it_client = _clients->begin(); it_client != _clients->end(); it_client++)
 	{
-		//envoyer le message si l'user n'est pas en mode off ??
-		for (std::vector<Channel>::iterator ite = it->_channels->begin(); ite != it->_channels->end(); ite++)
+		for (std::vector<Channel>::iterator it_channel = it_client->_channels->begin(); it_channel != it_client->_channels->end(); it_channel++)
 		{
-			if (ite->get_name() == channel->get_name() && it->get_nickname() != user->get_nickname())
-			{
-				it->answer = msg;
-				std::cout << it->answer << std::endl;
-			}
+			if (it_channel->get_name() == channel->get_name() && it_client->get_nickname() != user->get_nickname())
+				it_client->answer = msg;
+		}
+	}
+}
+
+void	ExecutionManager::send_msg_to_all_clients_of_channel(std::string msg, Client *user, Channel *channel)
+{
+	for (std::vector<Client>::iterator it_client = _clients->begin(); it_client != _clients->end(); it_client++)
+	{
+		for (std::vector<Channel>::iterator it_channel = it_client->_channels->begin(); it_channel != it_client->_channels->end(); it_channel++)
+		{
+			if (it_channel->get_name() == channel->get_name())
+				it_client->answer = msg;
 		}
 	}
 }
@@ -89,15 +97,17 @@ void	ExecutionManager::command_privmsg(std::vector<std::string> out, Client *use
 	{
 		channel_name = out[1];
 		if ((channel = find_channel(channel_name)) == NULL)
-		{
-			//Le channel n'existe pas
 			user->answer = out[1] + " No such channel" + ENDLINE;
-		}
 		else
 		{
-			for (int i = 2; i < out.size(); i++)
-				msg += " " + out[i];
-			send_msg_to_channel_clients(":" + user->get_nickname() + "!" + user->get_name() + "@server PRIVMSG " + channel->get_name() + " " + msg + ENDLINE, user, channel);
+			if (channel->is_moderated() && channel->is_voice_ok(user))
+			{
+				for (int i = 2; i < out.size(); i++)
+					msg += " " + out[i];
+				send_msg_to_channel_clients(":" + user->get_nickname() + "!" + user->get_name() + "@server PRIVMSG " + channel->get_name() + " " + msg + ENDLINE, user, channel);
+			}
+			else
+				user->answer = ":server 404 " + user->get_nickname() + " " + channel->get_name() + " :Cannot send to channel" + ENDLINE;
 		}
 	}
 	else if((other_user = find_client(out[1])) != NULL)
@@ -106,17 +116,13 @@ void	ExecutionManager::command_privmsg(std::vector<std::string> out, Client *use
 				msg += " " + out[i];
 		send_msg_to_client(":" + other_user->get_nickname() + "!" + other_user->get_name() + "@server PRIVMSG "+ user->get_nickname()+ " :" + msg + ENDLINE, other_user);
 	}
-	//user case
 	else
-	{
 		user->answer = out[1] + " No such channel" + ENDLINE;
-	}
 }
 
 Channel	*ExecutionManager::find_channel(std::string channel_name)
 {
 	size_t		size;
-	// size_t		i;
 
 	if (!_channels)
 		return (NULL);

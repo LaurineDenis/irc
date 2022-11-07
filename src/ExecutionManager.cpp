@@ -113,22 +113,13 @@ void		ExecutionManager::parseCmd(Client *client, std::string buffer, int index)
 	std::vector<std::string>	line = split(buffer, " \r\n");
 	int							cmd;
 
-	/* std::cout << "Parse command " << buffer << std::endl; */
-	/* for (std::vector<std::string>::iterator it = line.begin(); it != line.end(); ++it) */
-	/* 	std::cout << "|" << *it << "|" << std::endl; */
 	if ((cmd = is_command(line)) >= 0)
 	{
-		/* if (cmd == JOIN || cmd == PART) */
-		/* { */
-		/* 	line.resize(2); */
-		/* 	parse_channel_name(line); */
-		/* } */
 		dispatchCmd(client, line, index, cmd);
 	}
 	else
 	{
 		std::cout << "Command not found cmd = " << cmd << std::endl;
-		//command not found
 	}
 }
 
