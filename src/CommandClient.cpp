@@ -5,19 +5,29 @@ void	ExecutionManager::command_cap(std::vector<std::string> out)
 	std::cout << "command CAP" << std::endl;
 }
 
-void	ExecutionManager::command_ping(std::vector<std::string> out)
+void	ExecutionManager::command_ping(std::vector<std::string> out, Client *client)
 {
 	std::cout << "command PING" << std::endl;
+	std::string		token;
+
+	if (out.size() != 2)
+	{
+		std::cerr << "NTM avec tes erreurs" << std::endl;
+		//ERRROR
+	}
+	else 
+		client->answer = "PONG server " + out.at(1);
 }
 
 void	ExecutionManager::command_nick(std::vector<std::string> out, Client *client)
 {
 	std::string		old_nick;
+
 	std::cout << "command Nick" << std::endl;
-	client->_nick = 1;
 	old_nick = client->get_nickname();
 	if (check_nickname(out[1]))
 	{
+		client->_nick = 1;
 		client->set_nickname(out[1]);
 		if (client->wlcm_send == true)
 			client->answer = ":" + old_nick + "!" + client->get_name() + "@server NICK " + client->get_nickname() + ENDLINE;
@@ -42,7 +52,7 @@ void	ExecutionManager::send_msg_to_client(std::string msg, Client *other_client)
 
 Client	*ExecutionManager::find_client(std::string nickname)
 {
- 	size_t		size;
+	size_t		size;
 
 	if (!_clients)
 		return (NULL);
