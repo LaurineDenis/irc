@@ -4,24 +4,10 @@
 
 void	ExecutionManager::change_topic(std::string topic, std::string client, Channel *channel)
 {
-	// char			time_test[300];
 	time_t	rawtime;
 	struct	tm *timeinfo;
 
 	time(&rawtime);
-	/* timeinfo = localtime(&rawtime); */
-
-/* time_t rawtime; */
-/*   struct tm * timeinfo; */
-
-/*   time (&rawtime); */
-/*   timeinfo = localtime (&rawtime); */
-/*   printf ("Current local time and date: %s", asctime(timeinfo)); */
-
-	// struct tm * pTime = localtime( & timestamp );
-	// strftime(time_test, 300, "%a, %d %h %G %T", pTime);
-	// std::string		time_string;
-	/* std::cout << asctime(timeinfo) << std::endl; */
 	std::cout << ctime(&rawtime) << std::endl;
 	std::cout << rawtime << std::endl;
 	channel->set_topic(topic);
@@ -116,19 +102,29 @@ void	ExecutionManager::send_list_name_channel(Client *client, Channel *channel)
 	}
 }
 
-
-bool	ExecutionManager::check_right_channel(Channel *channel, Client *client)
+bool	ExecutionManager::check_right_channel(std::string channel_name, Client *client)
 {
-	if ((channel->is_invite_only() && channel->is_invited(client)) || !channel->is_invite_only())
+	Channel	*channel;
+
+	if ((channel = find_channel(channel_name)) != NULL)
 	{
-		if (!channel->is_banned(client))
-			return (true);
+		if (is_in_channel(channel, client))
+		{
+			client->answer += ":server 443 " + channel_name + " " + client->get_nickname() + "  :is already on channel" + ENDLINE;
+			return (false);
+		}
+		if ((channel->is_invite_only() && channel->is_invited(client)) || !channel->is_invite_only())
+		{
+			if (!channel->is_banned(client))
+				return (true);
+			else
+				client->answer += ":server 474 " + channel->get_name() + " :Cannot join channel (+b)" + ENDLINE;
+		}
 		else
-			client->answer += ":server 474 " + channel->get_name() + " :Cannot join channel (+b)" + ENDLINE;
+			client->answer += ":server 473 " + channel->get_name() + " :Cannot join channel (+i)" + ENDLINE;
+		return (false);
 	}
-	else
-		client->answer += ":server 473 " + channel->get_name() + " :Cannot join channel (+i)" + ENDLINE;
-	return (false);
+	return (true);
 }
 
 void	ExecutionManager::command_join(std::vector<std::string> line, Client *client)
@@ -137,24 +133,21 @@ void	ExecutionManager::command_join(std::vector<std::string> line, Client *clien
 	std::string					msg;
 	std::vector<std::string>	channel_names;
 
-	//Affichage
-	/* for (std::vector<std::string>::iterator it = line.begin(); it != line.end(); ++it) */
-	/* 	std::cout << "|" << *it << "|" << std::endl; */
 	line.resize(2);
 	channel_names = parse_channel_name(line);
 	for (int i = 0; i < channel_names.size(); i++)
 	{
-		if ((channel = find_channel(channel_names.at(i))) == NULL)
+		if (check_right_channel(channel_names.at(i), client) == true)
 		{
-			//creer le channel si il existe pas correspondant puis add channel in server
-			channel = new Channel(client, channel_names.at(i));
-			_channels->push_back(*channel);
+			if ((channel = find_channel(channel_names.at(i))) == NULL)
+			{
+				channel = new Channel(client, channel_names.at(i));
+				_channels->push_back(*channel);
+			}
+			add_channel_in_client(channel, client);
+			send_topic_reply(client, channel);
+			send_msg_to_channel_clients(":" + client->get_nickname() + "!" + client->get_nickname() + "@server JOIN " + channel->get_name() + ENDLINE, client, channel);
 		}
-		else if (!check_right_channel(channel, client))
-			break ;
-		add_channel_in_client(channel, client);
-		send_topic_reply(client, channel);
-		send_msg_to_channel_clients(":" + client->get_nickname() + "!" + client->get_nickname() + "@server JOIN " + channel->get_name() + ENDLINE, client, channel);
 	}
 }
 
@@ -291,13 +284,18 @@ void	ExecutionManager::command_invite(std::vector<std::string> line, Client *cli
 		{
 			if (is_in_channel(channel, to_invite) == false)
 			{
-				if (channel->is_invite_only() == true)
-					channel->add_invited(to_invite);
-				client->answer += ":server 341 " + client->get_nickname() + " " + line[1] + " " + line[2] + ENDLINE;
-				to_invite->answer += ":" + client->get_nickname() + "!" + client->get_nickname() + "@server INVITE " + to_invite->get_nickname() + " " + channel->get_name() + ENDLINE;
+				if (channel->is_invite_only() == true && channel->is_operator(client) || channel->is_invite_only() != true)
+				{
+					if (channel->is_invite_only() == true)
+						channel->add_invited(to_invite);
+					client->answer += ":server 341 " + client->get_nickname() + " " + line[1] + " " + line[2] + ENDLINE;
+					to_invite->answer += ":" + client->get_nickname() + "!" + client->get_nickname() + "@server INVITE " + to_invite->get_nickname() + " " + channel->get_name() + ENDLINE;
+				}
+				else
+					client->answer += ":server 482 " + channel->get_name() + " :You're not channel operator" + ENDLINE;
 			}
 			else
-				client->answer += ":server 443 " + line[1] + " " + line[2] + "  :is already on channel" + ENDLINE;
+				client->answer += ":server 443 " + line[2] + " " + line[1] + "  :is already on channel" + ENDLINE;
 		}
 		else
 			client->answer += ":server 442 " + line[2] + " :You're not on that channel" + ENDLINE;

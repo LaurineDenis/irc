@@ -2,12 +2,10 @@
 
 void	ExecutionManager::command_cap(std::vector<std::string> out)
 {
-	std::cout << "command CAP" << std::endl;
 }
 
 void	ExecutionManager::command_ping(std::vector<std::string> out, Client *client)
 {
-	std::cout << "command PING" << std::endl;
 	std::string		token;
 
 	if (out.size() != 2)
@@ -23,7 +21,6 @@ void	ExecutionManager::command_nick(std::vector<std::string> out, Client *client
 {
 	std::string		old_nick;
 
-	std::cout << "command Nick" << std::endl;
 	old_nick = client->get_nickname();
 	if (check_nickname(out[1]))
 	{
