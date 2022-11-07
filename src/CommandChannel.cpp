@@ -25,20 +25,25 @@ void	ExecutionManager::command_topic(std::vector<std::string> out, Client *clien
 			client->answer += ":server 403 " + out[1] + " No such channel" + ENDLINE;
 		else
 		{
-			std::cout << "Topic Time == " << channel->get_topic_time() << std::endl;
 			if (out.size() <= 2)
 			{
 				if (channel->get_topic() == "")
-					client->answer += ":server 331 " +  client->get_name() + " " + channel->get_name() + " :No topic is set" + ENDLINE;
+					client->answer += ":server 331 " +  client->get_nickname() + " " + channel->get_name() + " :No topic is set" + ENDLINE;
 				else
-					client->answer += ":server 332 " +  client->get_name() + " " + channel->get_name() + " :" + channel->get_topic() + ENDLINE + ":server 333 " +  client->get_name() + " " + channel->get_name() + " " + channel->get_topic_client() + " " + channel->get_topic_time() + ENDLINE;
+					client->answer += ":server 332 " +  client->get_nickname() + " " + channel->get_name() + " :" + channel->get_topic() + ENDLINE + ":server 333 " +  client->get_nickname() + " " + channel->get_name() + " " + channel->get_topic_client() + " " + channel->get_topic_time() + ENDLINE;
 			}
 			else if (out[2][0] != ':')
-				client->answer += ":server 461 " +  client->get_name() + " TOPIC :Not enough parameters" + ENDLINE;
+				client->answer += ":server 461 " +  client->get_nickname() + " TOPIC :Not enough parameters" + ENDLINE;
 			else
 			{
-				change_topic(out[2], client->get_name(), channel);
-				client->answer += ":server 332 " +  client->get_name() + " " + channel->get_name() + " :" + channel->get_topic() + ENDLINE;
+				if (channel->is_mode_topic() && channel->is_operator(client))
+				{
+					change_topic(out[2].erase(0, 1), client->get_nickname(), channel);
+					std::cout << "Topic client = " << channel->get_topic_client() << std::endl;
+					send_msg_to_all_clients_of_channel(":server 332 " +  client->get_nickname() + " " + channel->get_name() + " :" + channel->get_topic() + ENDLINE, client, channel);
+				}
+				else
+					client->answer += ":server 482 " + channel->get_name() + " :You're not channel operator" + ENDLINE;
 			}
 		}
 	}
@@ -77,7 +82,7 @@ void	ExecutionManager::send_topic_reply(Client *client, Channel *channel)
 {
 	client->answer += ":" + client->get_nickname() + "!" + client->get_nickname() + "@server JOIN " + channel->get_name() + ENDLINE;
 	if (channel->get_topic() != "")
-		client->answer += ":server 332 " +  client->get_name() + " " + channel->get_name() + " :" + channel->get_topic() + ENDLINE + ":server 333 " +  client->get_name() + " " + channel->get_name() + " " + channel->get_topic_client() + " " + channel->get_topic_time() + ENDLINE;
+		client->answer += ":server 332 " +  client->get_nickname() + " " + channel->get_name() + " :" + channel->get_topic() + ENDLINE + ":server 333 " +  client->get_name() + " " + channel->get_name() + " " + channel->get_topic_client() + " " + channel->get_topic_time() + ENDLINE;
 	send_list_name_channel(client, channel);
 }
 
