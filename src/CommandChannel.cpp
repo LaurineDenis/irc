@@ -190,29 +190,24 @@ void	ExecutionManager::command_part(std::vector<std::string> out, Client *client
 {
 	std::cout << "command Part" << std::endl;
 	Channel		*channel;
-	std::string	channel_name;
+	std::vector<std::string>	channel_names;
 
-	if (out[1][0] == '#')
+	out.resize(2);
+	channel_names = parse_channel_name(out);
+	for (int i = 0; i < channel_names.size(); i++)
 	{
-		channel_name = out[1];
-		if ((channel = find_channel(channel_name)) == NULL)
+		if ((channel = find_channel(channel_names.at(i))) == NULL)
 		{
-			//Le channel n'existe pas => Pas de message d'erreurs ?
-			std::cout << "No Channel found" << std::endl;
+			std::cerr << "No Channel found" << std::endl;
 			client->answer += ":server 403 " + out[1] + " No such channel" + ENDLINE;
 		}
 		else
 		{
-			//quit le channel qui existe deja
-			remove_client_of_channel(channel, client);
 			client->answer += ":" + client->get_nickname() + "!" + client->get_name() + "@server PART " + channel->get_name() + ENDLINE;
+			remove_client_of_channel(channel, client);
 			std::cout << "send = " << client->answer << std::endl;
 			send_msg_to_channel_clients(":" + client->get_nickname() + "!" + client->get_nickname() + "@server PART " + channel->get_name() + ENDLINE, client, channel);
 		}
-	}
-	else
-	{
-		client->answer += ":server 403 " + out[1] + " No such channel" + ENDLINE;
 	}
 }
 
