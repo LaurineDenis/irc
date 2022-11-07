@@ -53,7 +53,8 @@ class	ExecutionManager {
 		void		dispatchCmd(Client *client, std::vector<std::string> line, int index, int cmd);
 		void		parseCmd(Client *client, std::string buffer, int index);
 		void		IO_Operation();
-		void	send_topic_reply(Client *client, Channel *channel);
+		void		send_topic_reply(Client *client, Channel *channel);
+		void		send_list_name_channel(Client *client, Channel *channel);
 		ssize_t		recvCmd(int i);
 		bool	check_right_channel(Channel *channel, Client *client);
 		//command
@@ -73,7 +74,7 @@ class	ExecutionManager {
 		void	command_quit(Client *client, int index);
 		//mode
 		void	select_mode(Client *client, Channel *channel, std::vector<std::string> line, std::size_t pos);
-		void	check_mode(Client *client, Channel *channel, std::vector<std::string> line);
+		bool	check_mode(Client *client, Channel *channel, std::vector<std::string> line);
 		void	mode_invite(Client *client, Channel *channel, std::vector<std::string> line);
 		void	mode_topic(Client *client, Channel *channel, std::vector<std::string> line);
 		void	mode_operator(Client *client, Channel *channel, std::vector<std::string> line);
@@ -81,6 +82,7 @@ class	ExecutionManager {
 		void	mode_voice(Client *client, Channel *channel, std::vector<std::string> line);
 		void	mode_banned(Client *client, Channel *channel, std::vector<std::string> line);
 		void	change_topic(std::string topic, std::string client, Channel *channel);
+		void	send_msg_to_all_clients_of_channel(std::string msg, Client *client, Channel *channel);
 		void	send_msg_to_channel_clients(std::string msg, Client *client, Channel *channel);
 		void	send_msg_to_client(std::string msg, Client *other_client);
 		void	print_infos();

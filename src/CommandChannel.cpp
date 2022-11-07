@@ -20,7 +20,7 @@ void	ExecutionManager::command_topic(std::vector<std::string> out, Client *clien
 
 	if (out[1][0] == '#')
 	{
-		channel_name = out[1].erase(0, 1);
+		channel_name = out[1];
 		if ((channel = find_channel(channel_name)) == NULL)
 			client->answer += ":server 403 " + out[1] + " No such channel" + ENDLINE;
 		else
@@ -37,7 +37,7 @@ void	ExecutionManager::command_topic(std::vector<std::string> out, Client *clien
 				client->answer += ":server 461 " +  client->get_name() + " TOPIC :Not enough parameters" + ENDLINE;
 			else
 			{
-				change_topic(out[2].erase(0, 1), client->get_name(), channel);
+				change_topic(out[2], client->get_name(), channel);
 				client->answer += ":server 332 " +  client->get_name() + " " + channel->get_name() + " :" + channel->get_topic() + ENDLINE;
 			}
 		}
@@ -75,11 +75,16 @@ std::vector<std::string>	ExecutionManager::parse_channel_name(std::vector<std::s
 
 void	ExecutionManager::send_topic_reply(Client *client, Channel *channel)
 {
-	std::string	msg;
-
 	client->answer += ":" + client->get_nickname() + "!" + client->get_nickname() + "@server JOIN " + channel->get_name() + ENDLINE;
 	if (channel->get_topic() != "")
 		client->answer += ":server 332 " +  client->get_name() + " " + channel->get_name() + " :" + channel->get_topic() + ENDLINE + ":server 333 " +  client->get_name() + " " + channel->get_name() + " " + channel->get_topic_client() + " " + channel->get_topic_time() + ENDLINE;
+	send_list_name_channel(client, channel);
+}
+
+void	ExecutionManager::send_list_name_channel(Client *client, Channel *channel)
+{
+	std::string	msg;
+
 	if (channel->_clients->size() >= 1)
 	{
 		for (int i = 0; i < channel->_clients->size(); i++)
@@ -93,6 +98,7 @@ void	ExecutionManager::send_topic_reply(Client *client, Channel *channel)
 		client->answer += ":server 353 " +  client->get_name() + " = " + channel->get_name() + " :" + msg + ENDLINE;	
 	}
 }
+
 
 bool	ExecutionManager::check_right_channel(Channel *channel, Client *client)
 {
@@ -273,7 +279,7 @@ void	ExecutionManager::command_invite(std::vector<std::string> line, Client *cli
 			{
 				if (channel->is_invite_only() == true)
 					channel->add_invited(to_invite);
-				client->answer += ":server 341 RPL_INVITING " + line[1] + " " + line[2] + ENDLINE;
+				client->answer += ":server 341 " + client->get_nickname() + " " + line[1] + " " + line[2] + ENDLINE;
 				to_invite->answer += ":" + client->get_nickname() + "!" + client->get_nickname() + "@server INVITE " + to_invite->get_nickname() + " " + channel->get_name() + ENDLINE;
 			}
 			else
