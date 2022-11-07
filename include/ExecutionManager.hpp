@@ -56,7 +56,7 @@ class	ExecutionManager {
 		void		send_topic_reply(Client *client, Channel *channel);
 		void		send_list_name_channel(Client *client, Channel *channel);
 		ssize_t		recvCmd(int i);
-		bool	check_right_channel(Channel *channel, Client *client);
+		bool	check_right_channel(std::string channel_name, Client *client);
 		//command
 		std::vector<std::string>	parse_channel_name(std::vector<std::string> channel_name);
 		void	command_pass(std::vector<std::string> out, Client *client);

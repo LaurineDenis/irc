@@ -84,7 +84,7 @@ bool	ExecutionManager::check_mode(Client *client, Channel *channel, std::vector<
 				msg += "m";
 			if (channel->is_mode_topic())
 				msg += "t";
-			client->answer += ":server 324 MODE " + channel->get_name() + " " + msg + ENDLINE;
+			client->answer += ":server 324 " + client->get_nickname() + " " + channel->get_name() + " " + msg + ENDLINE;
 		}
 	}
 	else
@@ -168,12 +168,14 @@ void	ExecutionManager::mode_voice(Client *client, Channel *channel, std::vector<
         other_client = find_client(line.at(3).data());
         channel->add_voice_ok(other_client);
 		client->answer += ":" + client->get_nickname() +" MODE " + channel->get_name() + " +v " + other_client->get_nickname() + ENDLINE;
+		other_client->answer += ":" + client->get_nickname() +" MODE " + channel->get_name() + " +v " + other_client->get_nickname() + ENDLINE;
     }
     else if (line.at(2).at(0) == '-')
     {
 		other_client = find_client(line.at(3).data());
 		channel->remove_voice_ok(other_client);
 		client->answer += ":" + client->get_nickname() +" MODE " + channel->get_name() + " -v " + other_client->get_nickname() + ENDLINE;
+		other_client->answer += ":" + client->get_nickname() +" MODE " + channel->get_name() + " -v " + other_client->get_nickname() + ENDLINE;
 	}
 }
 
@@ -200,11 +202,8 @@ void	ExecutionManager::mode_banned(Client *client, Channel *channel, std::vector
 	else if (line.size() == 3)
 	{
 		std::string	msg;
-		msg = channel->list_banned();
-		if (msg == "")
-			client->answer += ":server 368 " + client->get_nickname() + " +b " + channel->get_name() + " :End of channel ban list" + ENDLINE;
-		else
-			client->answer += ":server 324 " + client->get_nickname() + " +b " + channel->get_name() + " " + msg + ENDLINE;
+		msg = channel->list_banned(client->get_nickname());
+		client->answer += ":server " + msg + "368 " + client->get_nickname() + " " + channel->get_name() + " :End of channel ban list" + ENDLINE;
 	}
 	else
 		client->answer += ":server 461 " + line.at(0) + " :Not enough parameters" + ENDLINE;
