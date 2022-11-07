@@ -48,14 +48,29 @@ void	ExecutionManager::command_topic(std::vector<std::string> out, Client *clien
 	}
 }
 
-bool	ExecutionManager::parse_channel_name(std::string channel_name)
+std::vector<std::string>	ExecutionManager::parse_channel_name(std::vector<std::string> channel_name)
 {
-	if (channel_name[0] == '#')
+	std::vector<std::string>	names;
+	std::string					s;
+
+	names = split(channel_name.at(1), ",");
+	for (int i = 0; i < channel_name.size(); i++)
+		std::cout << "|||" << channel_name.at(i) << std::endl;
+	for (int i = 0; i < names.size(); i++)
 	{
-		return (true);
+		s = names.at(i);
+		if (s[0] != '#')
+		{
+			names.erase(names.begin() + i);
+			// ERROR not a channel name
+		}
+		s.erase(0, 1);
+		if (s.find_first_of(" \7") != std::string::npos)
+		{
+			names.erase(names.begin() + i);
+		}
 	}
-	else
-		return (false);
+	return names;
 }
 
 void	ExecutionManager::send_topic_reply(Client *client, Channel *channel)
@@ -104,8 +119,6 @@ void	ExecutionManager::command_join(std::vector<std::string> line, Client *clien
 	for (std::vector<std::string>::iterator it = line.begin()+1; it != line.end(); ++it)
 	{
 		std::string		str = it->data();
-		if (parse_channel_name(str))
-		{
 				if ((channel = find_channel(str)) == NULL)
 				{
 					//creer le channel si il existe pas correspondant puis add channel in server
@@ -118,9 +131,6 @@ void	ExecutionManager::command_join(std::vector<std::string> line, Client *clien
 				send_topic_reply(client, channel);
 				send_msg_to_channel_clients(":" + client->get_nickname() + "!" + client->get_nickname() + "@server JOIN " + channel->get_name() + ENDLINE, client, channel);
 		}
-		else
-			client->answer += ":server 403 " + str + " No such channel" + ENDLINE;
-	}
 }
 
 bool	is_in_channel(Channel *channel, Client *client)

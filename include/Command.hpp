@@ -5,17 +5,19 @@
 
  class Server;
 
- enum	Command_lst
+ enum	Command_list
 {
-	NICK,
+	PASS,
 	USER,
+	NICK,
 	CAP,
+	PING,
 	JOIN,
 	PRIVMSG,
 	PART,
 	TOPIC,
 	KICK,
-	PING,
+	MODE,
 	QUIT
 };
 

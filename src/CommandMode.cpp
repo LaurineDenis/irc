@@ -13,8 +13,6 @@ void	ExecutionManager::command_mode(std::vector<std::string> line, Client *clien
 	
 	std::string		str = (line.begin()+1)->data();
 	std::cout << "str = "<< str <<std::endl;
-	if (parse_channel_name(str))
-	{
 		if ((channel = find_channel(str)) == NULL)
 			client->answer = ":server 403 " + str + " No such channel" + ENDLINE;
 		else
@@ -34,9 +32,6 @@ void	ExecutionManager::command_mode(std::vector<std::string> line, Client *clien
 			else
 				client->answer = ":server 472 " + str.erase(0, 1) + " :is unknown mode char to me for <channel>" + ENDLINE;
 		}
-	}
-	else
-		client->answer = ":server 403 " + str + " No such channel" + ENDLINE;
 }
 
 void	ExecutionManager::select_mode(Client *client, Channel *channel, std::vector<std::string> line, std::size_t pos)
@@ -177,7 +172,7 @@ void	ExecutionManager::mode_banned(Client *client, Channel *channel, std::vector
 {
 	std::cout << "Mode Banned" << std::endl;
 	Client  *other_client;
-
+  
 	if (line.size() > 3)
 	{
 		if (line.at(2).at(0) == '+')
