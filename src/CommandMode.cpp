@@ -13,8 +13,8 @@ void	ExecutionManager::command_mode(std::vector<std::string> line, Client *clien
 	
 	std::string		str = (line.begin()+1)->data();
 	std::cout << "str = "<< str <<std::endl;
-	if (parse_channel_name(str))
-	{
+	/* if (parse_channel_name(line)) */
+	/* { */
 		if ((channel = find_channel(str)) == NULL)
 			client->answer = ":server 403 " + str + " No such channel 1" + ENDLINE;
 		else
@@ -31,8 +31,8 @@ void	ExecutionManager::command_mode(std::vector<std::string> line, Client *clien
 				std::cout << "Mode Not found" << std::endl;
 			}
 		}
-	}
-	else
+	/* } */
+	/* else */
 		client->answer = ":server 403 " + str + " No such channel 2" + ENDLINE;
 }
 
