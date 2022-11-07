@@ -25,7 +25,7 @@ Channel::Channel(Client *creator, std::string name)
 	_topic_client = "";
 	_topic_time = "";
 	_invite_only = false;
-	_mode_topic = false;
+	_mode_topic = true;
 	_moderated = false;
 }
 
