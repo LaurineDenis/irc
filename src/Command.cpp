@@ -39,16 +39,24 @@ void	ExecutionManager::print_infos()
 
 void	ExecutionManager::send_msg_to_channel_clients(std::string msg, Client *user, Channel *channel)
 {
-	for (std::vector<Client>::iterator it = _clients->begin(); it != _clients->end(); it++)
+	for (std::vector<Client>::iterator it_client = _clients->begin(); it_client != _clients->end(); it_client++)
 	{
-		//envoyer le message si l'user n'est pas en mode off ??
-		for (std::vector<Channel>::iterator ite = it->_channels->begin(); ite != it->_channels->end(); ite++)
+		for (std::vector<Channel>::iterator it_channel = it_client->_channels->begin(); it_channel != it_client->_channels->end(); it_channel++)
 		{
-			if (ite->get_name() == channel->get_name() && it->get_nickname() != user->get_nickname())
-			{
-				it->answer = msg;
-				std::cout << it->answer << std::endl;
-			}
+			if (it_channel->get_name() == channel->get_name() && it_client->get_nickname() != user->get_nickname())
+				it_client->answer = msg;
+		}
+	}
+}
+
+void	ExecutionManager::send_msg_to_all_clients_of_channel(std::string msg, Client *user, Channel *channel)
+{
+	for (std::vector<Client>::iterator it_client = _clients->begin(); it_client != _clients->end(); it_client++)
+	{
+		for (std::vector<Channel>::iterator it_channel = it_client->_channels->begin(); it_channel != it_client->_channels->end(); it_channel++)
+		{
+			if (it_channel->get_name() == channel->get_name())
+				it_client->answer = msg;
 		}
 	}
 }
@@ -98,6 +106,7 @@ void	ExecutionManager::command_privmsg(std::vector<std::string> out, Client *use
 			for (int i = 2; i < out.size(); i++)
 				msg += " " + out[i];
 			send_msg_to_channel_clients(":" + user->get_nickname() + "!" + user->get_name() + "@server PRIVMSG " + channel->get_name() + " " + msg + ENDLINE, user, channel);
+			std::cout << "msg send ok" << std::endl;
 		}
 	}
 	else if((other_user = find_client(out[1])) != NULL)
