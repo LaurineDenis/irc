@@ -4,26 +4,9 @@
 
 void	ExecutionManager::change_topic(std::string topic, std::string client, Channel *channel)
 {
-	// char			time_test[300];
 	time_t	rawtime;
-	struct	tm *timeinfo;
 
 	time(&rawtime);
-	/* timeinfo = localtime(&rawtime); */
-
-/* time_t rawtime; */
-/*   struct tm * timeinfo; */
-
-/*   time (&rawtime); */
-/*   timeinfo = localtime (&rawtime); */
-/*   printf ("Current local time and date: %s", asctime(timeinfo)); */
-
-	// struct tm * pTime = localtime( & timestamp );
-	// strftime(time_test, 300, "%a, %d %h %G %T", pTime);
-	// std::string		time_string;
-	/* std::cout << asctime(timeinfo) << std::endl; */
-	std::cout << ctime(&rawtime) << std::endl;
-	std::cout << rawtime << std::endl;
 	channel->set_topic(topic);
 	channel->set_topic_client(client);
 	channel->set_topic_time(std::to_string(rawtime));
@@ -130,6 +113,8 @@ void	ExecutionManager::command_join(std::vector<std::string> line, Client *clien
 	Channel						*channel;
 	std::string					msg;
 	std::vector<std::string>	channel_names;
+	time_t						rawtime;
+
 
 	//Affichage
 	/* for (std::vector<std::string>::iterator it = line.begin(); it != line.end(); ++it) */
@@ -140,8 +125,8 @@ void	ExecutionManager::command_join(std::vector<std::string> line, Client *clien
 	{
 		if ((channel = find_channel(channel_names.at(i))) == NULL)
 		{
-			//creer le channel si il existe pas correspondant puis add channel in server
-			channel = new Channel(client, channel_names.at(i));
+			time(&rawtime);
+			channel = new Channel(client, channel_names.at(i), std::to_string(rawtime));
 			_channels->push_back(*channel);
 		}
 		else if (!check_right_channel(channel, client))
