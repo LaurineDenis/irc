@@ -60,7 +60,7 @@ class	ExecutionManager {
 		std::vector<std::string>	parse_channel_name(std::vector<std::string> channel_name);
 		void	command_pass(std::vector<std::string> out, Client *client);
 		void	command_cap(std::vector<std::string> out);
-		void	command_ping(std::vector<std::string> out);
+		void	command_ping(std::vector<std::string> out, Client *client);
 		void	command_nick(std::vector<std::string> out, Client *client);
 		void	command_client(std::vector<std::string> out, Client *client);
 		void	command_join(std::vector<std::string> out, Client *client);

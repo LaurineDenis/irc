@@ -155,7 +155,7 @@ void		ExecutionManager::dispatchCmd(Client *client, std::vector<std::string> lin
 			command_nick(line, client);
 			break;
 		case PING :
-			command_ping(line);
+			command_ping(line, client);
 			break;
 		case JOIN :
 			command_join(line, client);
