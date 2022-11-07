@@ -12,6 +12,7 @@
 # include <vector>
 # include <string>
 # include <unistd.h>
+# include <time.h>
 # include "Server.hpp"
 # include "Channel.hpp"
 # include "Message.hpp"

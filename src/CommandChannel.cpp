@@ -1,15 +1,32 @@
 #include "../include/Irc.hpp"
+#include <ctime>
+#include <string>
 
 void	ExecutionManager::change_topic(std::string topic, std::string client, Channel *channel)
 {
 	// char			time_test[300];
-	time_t	timestamp = time( NULL );
+	time_t	rawtime;
+	struct	tm *timeinfo;
+
+	time(&rawtime);
+	/* timeinfo = localtime(&rawtime); */
+
+/* time_t rawtime; */
+/*   struct tm * timeinfo; */
+
+/*   time (&rawtime); */
+/*   timeinfo = localtime (&rawtime); */
+/*   printf ("Current local time and date: %s", asctime(timeinfo)); */
+
 	// struct tm * pTime = localtime( & timestamp );
 	// strftime(time_test, 300, "%a, %d %h %G %T", pTime);
 	// std::string		time_string;
+	/* std::cout << asctime(timeinfo) << std::endl; */
+	std::cout << ctime(&rawtime) << std::endl;
+	std::cout << rawtime << std::endl;
 	channel->set_topic(topic);
 	channel->set_topic_client(client);
-	channel->set_topic_time(ctime(&timestamp));
+	channel->set_topic_time(std::to_string(rawtime));
 }
 
 void	ExecutionManager::command_topic(std::vector<std::string> out, Client *client)
@@ -20,7 +37,7 @@ void	ExecutionManager::command_topic(std::vector<std::string> out, Client *clien
 
 	if (out[1][0] == '#')
 	{
-		channel_name = out[1].erase(0, 1);
+		channel_name = out[1];
 		if ((channel = find_channel(channel_name)) == NULL)
 			client->answer += ":server 403 " + out[1] + " No such channel" + ENDLINE;
 		else
@@ -37,7 +54,7 @@ void	ExecutionManager::command_topic(std::vector<std::string> out, Client *clien
 				client->answer += ":server 461 " +  client->get_name() + " TOPIC :Not enough parameters" + ENDLINE;
 			else
 			{
-				change_topic(out[2].erase(0, 1), client->get_name(), channel);
+				change_topic(out[2], client->get_name(), channel);
 				client->answer += ":server 332 " +  client->get_name() + " " + channel->get_name() + " :" + channel->get_topic() + ENDLINE;
 			}
 		}
