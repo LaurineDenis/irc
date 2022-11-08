@@ -125,8 +125,7 @@ void		ExecutionManager::parseCmd(Client *client, std::string buffer, int index)
 	}
 	else
 	{
-		std::cerr << "Command not found cmd = " << cmd << std::endl;
-		// ERROR cmd not found
+		std::cout << "Command not found cmd = " << cmd << std::endl;
 	}
 }
 

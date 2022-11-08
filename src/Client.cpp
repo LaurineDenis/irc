@@ -116,19 +116,3 @@ bool		Client::is_register(int cmd)
 	}
 	return true;
 }
-
-/* bool			Client::recvCmd(int fd) */
-/* { */
-/* 	std::string		cmd = ""; */
-/* 	ssize_t			ret = 0; */
-/* 	char			buffer[4096] = {0}; */
-
-/* 	while (cmd.find(ENDLINE, 0) == std::string::npos) */
-/* 	{ */
-/* 		std::cout << cmd.find(ENDLINE, 0) << std::endl; */
-/* 		ret += recv(fd, buffer + ret, sizeof(buffer), 0); */
-/* 		buffer[ret + 1] = 0; */
-/* 		cmd = buffer; */
-/* 	} */
-/* 	return (0); */
-/* } */

@@ -44,6 +44,7 @@ class	Channel
 		void					change_invite_only(bool invite_only);
 		void					change_mode_topic(bool mode_topic);
 		void					change_moderated(bool moderated);
+		std::string				list_banned(std::string name);
 		std::vector<Client>		*_clients;
 
 	private:
