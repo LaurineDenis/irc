@@ -64,10 +64,12 @@ std::vector<std::string>	ExecutionManager::parse_channel_name(std::vector<std::s
 			names.erase(names.begin() + i);
 			// ERROR not a channel name
 		}
-		s.erase(0, 1);
-		if (s.find_first_of(" \7") != std::string::npos)
+		else 
 		{
-			names.erase(names.begin() + i);
+			s.erase(0, 1);
+			if (s.find_first_of(" \7") != std::string::npos)
+				names.erase(names.begin() + i);
+
 		}
 	}
 	return names;
@@ -114,7 +116,6 @@ void	ExecutionManager::command_join(std::vector<std::string> line, Client *clien
 	std::string					msg;
 	std::vector<std::string>	channel_names;
 	time_t						rawtime;
-
 
 	//Affichage
 	/* for (std::vector<std::string>::iterator it = line.begin(); it != line.end(); ++it) */
