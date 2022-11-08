@@ -93,6 +93,7 @@ void		ExecutionManager::deleteClient(int i)
 		remove_client_of_channel(channel, client);
 	}
 	this->_clients->erase(this->_clients->cbegin() + i);
+	close(this->_clientSd.at(i + 1).fd);
 	this->_clientSd.erase(this->_clientSd.cbegin() + i + 1);
 	/* close connection? */
 }
@@ -115,6 +116,11 @@ void		ExecutionManager::parseCmd(Client *client, std::string buffer, int index)
 
 	if ((cmd = is_command(line)) >= 0)
 	{
+		if (!client->is_register(cmd))
+		{
+			std::cerr << "registration error mamene" << std::endl;
+			return;
+		}
 		dispatchCmd(client, line, index, cmd);
 	}
 	else
@@ -126,11 +132,6 @@ void		ExecutionManager::parseCmd(Client *client, std::string buffer, int index)
 void		ExecutionManager::dispatchCmd(Client *client, std::vector<std::string> line, int index, int cmd)
 {
 	std::cout << cmd << std::endl;
-	if (!client->is_register(cmd))
-	{
-		std::cout << "registration error mamene" << std::endl;
-		return;
-	}
 	switch (cmd)
 	{
 		case PASS :
@@ -207,7 +208,7 @@ ssize_t		ExecutionManager::recvCmd(int i)
 	std::string		cmd;
 	ssize_t			ret = 0;
 	char			buffer[512] = {0};
-  
+
 	cmd = this->_clients->at(i - 1).get_cmd();
 	ret = recv(this->_clientSd.at(i).fd, buffer, sizeof(buffer), 0);
 	buffer[ret] = 0;
@@ -216,7 +217,7 @@ ssize_t		ExecutionManager::recvCmd(int i)
 	this->_clients->at(i - 1).set_cmd(cmd);
 	if (cmd.find(ENDLINE) != std::string::npos)
 		return 1;
-	else if (ret > 0 && !cmd.size())
+	else if (ret == 0 && !cmd.size())
 		return -1;
 	return 0;
 }
@@ -233,7 +234,7 @@ void		ExecutionManager::IO_Operation()
 		if (to_process == -1)
 		{
 			std::cout << "Client " << this->_clientSd.at(i).fd << " disconnected!" << std::endl;
-			command_quit(&this->_clients->at(i - 1), i);
+			command_quit(&this->_clients->at(i - 1), i - 1);
 		}
 		else if (to_process)
 		{
