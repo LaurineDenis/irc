@@ -141,7 +141,6 @@ bool			Channel::is_banned(Client *client)
 {
 	for (std::vector<Client>::iterator ite = _banned->begin(); ite != _banned->end(); ite++)
 	{
-		std::cout << "Banned = " << ite->get_nickname() << std::endl;
 		if (ite->get_nickname() == client->get_nickname())
 			return (true) ;
 	}
@@ -283,7 +282,7 @@ std::string		Channel::list_banned(std::string name)
 
 	for (std::vector<Client>::iterator is_ban = _banned->begin(); is_ban < _banned->end(); is_ban++)
 	{
-		msg += "367 " + name + " " + get_name() + " " + is_ban->get_nickname() + " " + ENDLINE;
+		msg += RPL_BANLIST(name, get_name(), is_ban->get_nickname());
 	}
 	return (msg);
 }

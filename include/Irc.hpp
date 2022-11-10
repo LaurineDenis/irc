@@ -18,6 +18,7 @@
 # include "Message.hpp"
 # include "Client.hpp"
 # include "ExecutionManager.hpp"
+# include "NumericReply.hpp"
 // # include "Command/Cap.hpp"
 // # include "Command/Join.hpp"
 // # include "Command/Kick.hpp"

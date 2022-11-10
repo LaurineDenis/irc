@@ -8,8 +8,6 @@ void	ExecutionManager::change_topic(std::string topic, std::string client, Chann
 	struct	tm *timeinfo;
 
 	time(&rawtime);
-	std::cout << ctime(&rawtime) << std::endl;
-	std::cout << rawtime << std::endl;
 	channel->set_topic(topic);
 	channel->set_topic_client(client);
 	channel->set_topic_time(std::to_string(rawtime));
@@ -25,42 +23,47 @@ void	ExecutionManager::command_topic(std::vector<std::string> out, Client *clien
 	{
 		channel_name = out[1];
 		if ((channel = find_channel(channel_name)) == NULL)
-			client->answer += ":server 403 " + out[1] + " No such channel" + ENDLINE;
+			client->answer += ERR_NOSUCHCHANNEL(out[1]);
 		else
 		{
-			if (out.size() <= 2)
+			if (is_in_channel(channel, client))
 			{
-				if (channel->get_topic() == "")
-					client->answer += ":server 331 " +  client->get_nickname() + " " + channel->get_name() + " :No topic is set" + ENDLINE;
-				else
-					client->answer += ":server 332 " +  client->get_nickname() + " " + channel->get_name() + " :" + channel->get_topic() + ENDLINE + ":server 333 " +  client->get_nickname() + " " + channel->get_name() + " " + channel->get_topic_client() + " " + channel->get_topic_time() + ENDLINE;
-			}
-			else if (out[2][0] != ':')
-				client->answer += ":server 461 " +  client->get_nickname() + " TOPIC :Not enough parameters" + ENDLINE;
-			else
-			{
-				if (channel->is_mode_topic() && channel->is_operator(client))
+				if (out.size() <= 2)
 				{
-					change_topic(out[2].erase(0, 1), client->get_nickname(), channel);
-					std::cout << "Topic client = " << channel->get_topic_client() << std::endl;
-					send_msg_to_all_clients_of_channel(":server 332 " +  client->get_nickname() + " " + channel->get_name() + " :" + channel->get_topic() + ENDLINE, client, channel);
+					if (channel->get_topic() == "")
+						client->answer += RPL_NOTOPIC(client->get_nickname(), channel->get_name());
+					else
+						client->answer += RPL_TOPIC(client->get_nickname(), channel->get_name(), channel->get_topic()) + RPL_TOPICWHOTIME(client->get_nickname(), channel->get_name(), channel->get_topic_client(), channel->get_topic_time());
 				}
+				else if (out[2][0] != ':')
+					client->answer += ERR_NEEDMOREPARAMS(out.at(0));
 				else
-					client->answer += ":server 482 " + channel->get_name() + " :You're not channel operator" + ENDLINE;
+				{
+					if (channel->is_mode_topic() && channel->is_operator(client))
+					{
+						change_topic(out[2].erase(0, 1), client->get_nickname(), channel);
+						send_msg_to_all_clients_of_channel(RPL_TOPIC(client->get_nickname(), channel->get_name(), channel->get_topic()), client, channel);
+					}
+					else
+						client->answer += ERR_CHANOPRIVSNEEDED(channel->get_name());
+				}
 			}
+			else
+				client->answer += ERR_NOTONCHANNEL(channel->get_name());
 		}
 	}
 	else
 	{
-		client->answer += ":server 403 " + out[1] + " No such channel" + ENDLINE;
+		client->answer += ERR_NOSUCHCHANNEL(out[1]);
 	}
 }
 
-std::vector<std::string>	ExecutionManager::parse_channel_name(std::vector<std::string> channel_name)
+std::vector<std::string>	ExecutionManager::parse_channel_name(std::vector<std::string> channel_name, Client *client)
 {
 	std::vector<std::string>	names;
 	std::string					s;
 
+	channel_name.resize(2);
 	names = split(channel_name.at(1), ",");
 	for (int i = 0; i < channel_name.size(); i++)
 		std::cout << "|||" << channel_name.at(i) << std::endl;
@@ -69,6 +72,7 @@ std::vector<std::string>	ExecutionManager::parse_channel_name(std::vector<std::s
 		s = names.at(i);
 		if (s[0] != '#')
 		{
+			client->answer += ERR_NOSUCHCHANNEL(names.at(i));
 			names.erase(names.begin() + i);
 			// ERROR not a channel name
 		}
@@ -83,27 +87,27 @@ std::vector<std::string>	ExecutionManager::parse_channel_name(std::vector<std::s
 
 void	ExecutionManager::send_topic_reply(Client *client, Channel *channel)
 {
-	client->answer += ":" + client->get_nickname() + "!" + client->get_nickname() + "@server JOIN " + channel->get_name() + ENDLINE;
+	client->answer += MSG_JOIN(channel->get_name(), client->get_nickname());
 	if (channel->get_topic() != "")
-		client->answer += ":server 332 " +  client->get_nickname() + " " + channel->get_name() + " :" + channel->get_topic() + ENDLINE + ":server 333 " +  client->get_name() + " " + channel->get_name() + " " + channel->get_topic_client() + " " + channel->get_topic_time() + ENDLINE;
+		client->answer += RPL_TOPIC(client->get_nickname(), channel->get_name(), channel->get_topic());
 	send_list_name_channel(client, channel);
 }
 
 void	ExecutionManager::send_list_name_channel(Client *client, Channel *channel)
 {
-	std::string	msg;
+	std::string	lst_names;
 
 	if (channel->_clients->size() >= 1)
 	{
 		for (int i = 0; i < channel->_clients->size(); i++)
 		{
 			if (i != 0)
-				msg += " ";
+				lst_names += " ";
 			if (channel->is_operator(&channel->_clients->at(i)) == true)
-				msg+= "@";
-			msg += channel->_clients->at(i).get_nickname();
+				lst_names+= "@";
+			lst_names += channel->_clients->at(i).get_nickname();
 		}
-		client->answer += ":server 353 " +  client->get_name() + " = " + channel->get_name() + " :" + msg + ENDLINE;	
+		client->answer += RPL_NAMREPLY(channel->get_name(), client->get_nickname(), lst_names);	
 	}
 }
 
@@ -115,7 +119,7 @@ bool	ExecutionManager::check_right_channel(std::string channel_name, Client *cli
 	{
 		if (is_in_channel(channel, client))
 		{
-			client->answer += ":server 443 " + channel_name + " " + client->get_nickname() + "  :is already on channel" + ENDLINE;
+			client->answer += ERR_USERONCHANNEL(client->get_nickname(), channel->get_name());
 			return (false);
 		}
 		if ((channel->is_invite_only() && channel->is_invited(client)) || !channel->is_invite_only())
@@ -123,10 +127,10 @@ bool	ExecutionManager::check_right_channel(std::string channel_name, Client *cli
 			if (!channel->is_banned(client))
 				return (true);
 			else
-				client->answer += ":server 474 " + channel->get_name() + " :Cannot join channel (+b)" + ENDLINE;
+				client->answer += ERR_BANNEDFROMCHAN(channel->get_name());
 		}
 		else
-			client->answer += ":server 473 " + channel->get_name() + " :Cannot join channel (+i)" + ENDLINE;
+			client->answer += ERR_INVITEONLYCHAN(channel->get_name());
 		return (false);
 	}
 	return (true);
@@ -138,8 +142,7 @@ void	ExecutionManager::command_join(std::vector<std::string> line, Client *clien
 	std::string					msg;
 	std::vector<std::string>	channel_names;
 
-	line.resize(2);
-	channel_names = parse_channel_name(line);
+	channel_names = parse_channel_name(line, client);
 	for (int i = 0; i < channel_names.size(); i++)
 	{
 		if (check_right_channel(channel_names.at(i), client) == true)
@@ -151,7 +154,7 @@ void	ExecutionManager::command_join(std::vector<std::string> line, Client *clien
 			}
 			add_channel_in_client(channel, client);
 			send_topic_reply(client, channel);
-			send_msg_to_channel_clients(":" + client->get_nickname() + "!" + client->get_nickname() + "@server JOIN " + channel->get_name() + ENDLINE, client, channel);
+			send_msg_to_channel_clients(MSG_JOIN(channel->get_name(), client->get_nickname()), client, channel);
 		}
 	}
 }
@@ -213,21 +216,26 @@ void	ExecutionManager::command_part(std::vector<std::string> out, Client *client
 	Channel		*channel;
 	std::vector<std::string>	channel_names;
 
-	out.resize(2);
-	channel_names = parse_channel_name(out);
+	channel_names = parse_channel_name(out, client);
 	for (int i = 0; i < channel_names.size(); i++)
 	{
 		if ((channel = find_channel(channel_names.at(i))) == NULL)
-		{
-			std::cerr << "No Channel found" << std::endl;
-			client->answer += ":server 403 " + out[1] + " No such channel" + ENDLINE;
-		}
+			client->answer += ERR_NOSUCHCHANNEL(out[1]);
 		else
 		{
-			client->answer += ":" + client->get_nickname() + "!" + client->get_name() + "@server PART " + channel->get_name() + ENDLINE;
-			std::cout << "send = " << client->answer << std::endl;
-			send_msg_to_channel_clients(":" + client->get_nickname() + "!" + client->get_nickname() + "@server PART " + channel->get_name() + ENDLINE, client, channel);
-			remove_client_of_channel(channel, client);
+			if (is_in_channel(channel, client))
+			{
+				// client->answer += ":" + client->get_nickname() + "!" + client->get_name() + "@server PART " + channel->get_name() + ENDLINE;
+				std::string	part_msg;
+				if (out.size() >= 3)
+					part_msg = out.at(2);
+				else
+					part_msg = "";
+				send_msg_to_channel_clients(MSG_PART(channel->get_name(), client->get_nickname(), part_msg), client, channel);
+				remove_client_of_channel(channel, client);
+			}
+			else
+				client->answer += ERR_NOTONCHANNEL(channel->get_name());
 		}
 	}
 }
@@ -236,41 +244,45 @@ void	ExecutionManager::command_kick(std::vector<std::string> out, Client *client
 {
 	std::cout << "command Kick" << std::endl;
 	Channel		*channel;
-	std::string	channel_name;
+	std::vector<std::string>	channel_names;
+	std::vector<std::string>	user_names;
 
-	if (out[1][0] == '#')
+	channel_names = parse_channel_name(out, client);
+	for (int i = 0; i < channel_names.size(); i++)
 	{
-		channel_name = out[1];
-		if ((channel = find_channel(channel_name)) == NULL)
-		{
-			//Le channel n'existe pas => Pas de message d'erreurs ?
-			std::cout << "No Channel found" << std::endl;
-			client->answer += ":server 403 " + out[1] + " No such channel" + ENDLINE;
-		}
+		if ((channel = find_channel(channel_names.at(i))) == NULL)
+			client->answer += ERR_NOSUCHCHANNEL(channel_names.at(i));
 		else
 		{
-			if (channel->is_operator(client) == true)
+			if (is_in_channel(channel, client))
 			{
-				Client	*clientToKick;
-				if ((clientToKick = find_client(out[2])) != NULL && is_in_channel(channel, client) == true)
+				if (channel->is_operator(client) == true)
 				{
-					// remove client from channel
-					remove_client_of_channel(channel, clientToKick);
-					// send msg to client kicked
-					client->answer = ":" + client->get_nickname() + "!" + client->get_name() + "@server KICK " + channel->get_name() + " " + out[2] + ENDLINE;
-					// send msg to client who kicked
-					send_msg_to_client(client->answer, clientToKick);
+					user_names = split(out.at(2), ",");
+					for (int j = 0; j < user_names.size(); j++)
+					{
+						Client	*clientToKick;
+						if ((clientToKick = find_client(user_names.at(j))) != NULL && is_in_channel(channel, clientToKick) == true)
+						{
+							std::string		kick_msg;
+							remove_client_of_channel(channel, clientToKick);
+							if (out.size() >= 4)
+								kick_msg = out[3];
+							else
+								kick_msg = "";
+							clientToKick->answer += MSG_KICK(client->get_nickname(), channel->get_name(), clientToKick->get_nickname(), kick_msg);
+							client->answer += MSG_KICK(client->get_nickname(), channel->get_name(), clientToKick->get_nickname(), kick_msg);
+						}
+						else
+							client->answer += ERR_USERNOTINCHANNEL(user_names.at(j), channel->get_name());
+					}
 				}
 				else
-					client->answer += ":server 441 " + client->get_nickname() + " " + out[1] + " :They aren't on that channel" + ENDLINE;
+					client->answer += ERR_CHANOPRIVSNEEDED(channel->get_name());
 			}
 			else
-				client->answer += ":server 482 " + out[1] + " :You're not channel operator" + ENDLINE;
+				client->answer += ERR_NOTONCHANNEL(channel->get_name());
 		}
-	}
-	else
-	{
-		client->answer += ":server 403 " + out[1] + " No such channel" + ENDLINE;
 	}
 }
 
@@ -280,9 +292,6 @@ void	ExecutionManager::command_invite(std::vector<std::string> line, Client *cli
 	std::string			msg;
 	Client				*to_invite;
 
-	//Affichage
-	for (std::vector<std::string>::iterator it = line.begin(); it != line.end(); ++it)
-		std::cout << "|" << *it << "|" << std::endl;
 	if ((to_invite = find_client(line[1])) != NULL && (channel = find_channel(line[2])) != NULL)
 	{
 		if (is_in_channel(channel, client) == true)
@@ -293,18 +302,18 @@ void	ExecutionManager::command_invite(std::vector<std::string> line, Client *cli
 				{
 					if (channel->is_invite_only() == true)
 						channel->add_invited(to_invite);
-					client->answer += ":server 341 " + client->get_nickname() + " " + line[1] + " " + line[2] + ENDLINE;
-					to_invite->answer += ":" + client->get_nickname() + "!" + client->get_nickname() + "@server INVITE " + to_invite->get_nickname() + " " + channel->get_name() + ENDLINE;
+					client->answer += RPL_INVITING(client->get_nickname(), channel->get_name(), to_invite->get_nickname());
+					to_invite->answer += RPL_INVITING(client->get_nickname(), channel->get_name(), to_invite->get_nickname());
 				}
 				else
-					client->answer += ":server 482 " + channel->get_name() + " :You're not channel operator" + ENDLINE;
+					client->answer += ERR_CHANOPRIVSNEEDED(channel->get_name());
 			}
 			else
-				client->answer += ":server 443 " + line[2] + " " + line[1] + "  :is already on channel" + ENDLINE;
+				client->answer += ERR_USERONCHANNEL(line[2], channel->get_name());
 		}
 		else
-			client->answer += ":server 442 " + line[2] + " :You're not on that channel" + ENDLINE;
+			client->answer += ERR_NOTONCHANNEL(channel->get_name());
 	}
 	else
-		client->answer += ":server 401 " + line[1] + " :No such nick/channel" + ENDLINE;
+		client->answer += ERR_NOSUCHNICK(line[1]);
 }
