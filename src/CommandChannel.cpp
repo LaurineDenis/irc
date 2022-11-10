@@ -64,9 +64,9 @@ std::vector<std::string>	ExecutionManager::parse_channel_name(std::vector<std::s
 
 	channel_name.resize(2);
 	names = split(channel_name.at(1), ",");
-	for (int i = 0; i < channel_name.size(); i++)
+	for (unsigned long i = 0; i < channel_name.size(); i++)
 		std::cout << "|||" << channel_name.at(i) << std::endl;
-	for (int i = 0; i < names.size(); i++)
+	for (unsigned long i = 0; i < names.size(); i++)
 	{
 		s = names.at(i);
 		if (s[0] != '#')
@@ -100,7 +100,7 @@ void	ExecutionManager::send_list_name_channel(Client *client, Channel *channel)
 
 	if (channel->_clients->size() >= 1)
 	{
-		for (int i = 0; i < channel->_clients->size(); i++)
+		for (unsigned long i = 0; i < channel->_clients->size(); i++)
 		{
 			if (i != 0)
 				lst_names += " ";
@@ -145,11 +145,12 @@ void	ExecutionManager::command_join(std::vector<std::string> line, Client *clien
 	time_t						rawtime;
 
 	channel_names = parse_channel_name(line, client);
-	for (int i = 0; i < channel_names.size(); i++)
+	for (unsigned long i = 0; i < channel_names.size(); i++)
 	{
 		channel = find_channel(channel_names.at(i));
 		if (channel == NULL)
 		{
+			time(&rawtime);
 			channel = new Channel(client, channel_names.at(i), std::to_string(rawtime));
 			_channels->push_back(*channel);
 		}
@@ -217,7 +218,7 @@ void	ExecutionManager::command_part(std::vector<std::string> out, Client *client
 	std::vector<std::string>	channel_names;
 
 	channel_names = parse_channel_name(out, client);
-	for (int i = 0; i < channel_names.size(); i++)
+	for (unsigned long i = 0; i < channel_names.size(); i++)
 	{
 		if ((channel = find_channel(channel_names.at(i))) == NULL)
 			client->answer += ERR_NOSUCHCHANNEL(out[1]);
@@ -298,7 +299,7 @@ void	ExecutionManager::command_invite(std::vector<std::string> line, Client *cli
 		{
 			if (is_in_channel(channel, to_invite) == false)
 			{
-				if (channel->is_invite_only() == true && channel->is_operator(client) || channel->is_invite_only() != true)
+				if ((channel->is_invite_only() == true && channel->is_operator(client)) || channel->is_invite_only() != true)
 				{
 					if (channel->is_invite_only() == true)
 						channel->add_invited(to_invite);

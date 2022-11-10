@@ -51,6 +51,8 @@ void	ExecutionManager::send_msg_to_channel_clients(std::string msg, Client *user
 
 void	ExecutionManager::send_msg_to_all_clients_of_channel(std::string msg, Client *user, Channel *channel)
 {
+	/* void(user); */
+	(void)user;
 	for (std::vector<Client>::iterator it_client = _clients->begin(); it_client != _clients->end(); it_client++)
 	{
 		for (std::vector<Channel>::iterator it_channel = it_client->_channels->begin(); it_channel != it_client->_channels->end(); it_channel++)
@@ -89,7 +91,7 @@ void	ExecutionManager::command_privmsg(std::vector<std::string> out, Client *use
 		{
 			if (channel->is_moderated() && channel->is_voice_ok(user))
 			{
-				for (int i = 2; i < out.size(); i++)
+				for (unsigned long i = 2; i < out.size(); i++)
 					msg += " " + out[i];
 				send_msg_to_channel_clients(MSG_PRIVMSG(user->get_nickname(), channel->get_name(), msg), user, channel);
 			}
@@ -99,7 +101,7 @@ void	ExecutionManager::command_privmsg(std::vector<std::string> out, Client *use
 	}
 	else if((other_user = find_client(out[1])) != NULL)
 	{
-		for (int i = 2; i < out.size(); i++)
+		for (unsigned long i = 2; i < out.size(); i++)
 				msg += " " + out[i];
 		send_msg_to_client(MSG_PRIVMSG(user->get_nickname(), other_user->get_nickname(), msg), other_user);
 	}

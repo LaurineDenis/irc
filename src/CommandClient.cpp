@@ -2,6 +2,7 @@
 
 void	ExecutionManager::command_cap(std::vector<std::string> out)
 {
+	(void)out;
 }
 
 void	ExecutionManager::command_ping(std::vector<std::string> out, Client *client)
@@ -28,7 +29,7 @@ void	ExecutionManager::command_nick(std::vector<std::string> out, Client *client
 		if (client->wlcm_send == true)
 		{
 			client->answer += MSG_NICK(old_nick, client->get_nickname());
-			for (int i = 0; i < _clients->size(); i++)
+			for (unsigned long i = 0; i < _clients->size(); i++)
 				if(client->get_name() != _clients->at(i).get_name())
 					_clients->at(i).answer = MSG_NICK(old_nick, client->get_nickname());
 		}
@@ -80,9 +81,6 @@ bool	ExecutionManager::check_nickname(std::string nickname)
 
 void	ExecutionManager::command_client(std::vector<std::string> out, Client *client)
 {
-	std::cout << "command Client" << std::endl;
-	if (client->_user)
-		return;
 	client->_user = 1;
 	client->set_name(out[1]);
 	if (client->get_nickname().size() != 0 && !client->wlcm_send)
@@ -103,5 +101,6 @@ void	ExecutionManager::command_client(std::vector<std::string> out, Client *clie
 void	ExecutionManager::command_quit(Client *client, int index)
 {
 	std::cout << "command Quit" << std::endl;
-	deleteClient(index);
+	client->_del = 1;
+	(void)index;
 }

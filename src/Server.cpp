@@ -21,6 +21,7 @@ void	Server::init(int ac, char **av)
 	if (this->_port > 65535 || this->_port < 1024) // a check
 	{
 		std::cerr << " 1024 < <port> < 65535" << std::endl;
+		exit(false);
 	}
 }
 
@@ -28,7 +29,7 @@ void		Server::start(ExecutionManager *exec)
 {
 	int					sockets;
 	int					opt = 1;
-	struct sockaddr_in	addr = {AF_INET, INADDR_ANY, htons(this->_port)};
+	struct sockaddr_in	addr = {AF_INET, INADDR_ANY, htons(this->_port), {0}, {0}};
 
 	if ((sockets = socket(PF_INET, SOCK_STREAM, 0)) < 0)
 	{

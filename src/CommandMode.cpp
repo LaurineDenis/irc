@@ -137,7 +137,7 @@ void	ExecutionManager::mode_operator(Client *client, Channel *channel, std::vect
 	    channel->add_operator(other_client);
 		send_msg_to_all_clients_of_channel(MSG_MODE_DETAILS(client->get_nickname(), channel->get_name(), " +o ", other_client->get_nickname()), client, channel);
     }
-    else if (line.at(2).at(0) == '-')
+    else
     {
 		other_client = find_client(line.at(3).data());
 		channel->remove_operator(other_client);
