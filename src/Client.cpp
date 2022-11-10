@@ -59,21 +59,18 @@ void			Client::set_checkPw(bool i)
 
 void			Client::set_nickname(std::string nickname)
 {
-	// std::cout << "Set NickName" << std::endl;
 	if (_nickname != nickname)
 		_nickname = nickname;
 }
 
 void			Client::set_name(std::string name)
 {
-	// std::cout << "Set Name = |" << name << "|" << std::endl;
 	if (_name != name)
 		_name = name;
 }
 
 void			Client::set_password(std::string password)
 {
-	// std::cout << "Set Password" << std::endl;
 	if (_password != password)
 		_password = password;
 }
@@ -101,17 +98,22 @@ bool		Client::is_register(int cmd)
 {
 	if (cmd == PASS && _pw)
 	{
-		// ERROR
+		answer += ERR_ALREADYREGISTRED;
 		return false;
 	}
 	if (cmd > PASS && !_pw)
 	{
-		// ERROR
+		answer += ERR_NOTREGISTERED;
 		return false;
 	}
 	if (cmd > NICK && (!_user || !_nick))
 	{
-		// ERROR
+		answer += ERR_NOTREGISTERED;
+		return false;
+	}
+	if (cmd == USER && _user)
+	{
+		answer += ERR_ALREADYREGISTRED;
 		return false;
 	}
 	return true;

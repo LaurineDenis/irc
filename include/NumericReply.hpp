@@ -27,6 +27,7 @@
 #define ERR_NOTREGISTERED								"451 :You have not registrered\r\n"
 #define ERR_NEEDMOREPARAMS(command)						"461 " + command + " :Not enough parameters" + ENDLINE
 #define ERR_ALREADYREGISTRED							"462 :Unauthorized command (already registered)\r\n"
+#define ERR_PASSWDMISMATCH(nickname)					"464 " + nickname + " :Password incorrect" + ENDLINE
 #define ERR_INVITEONLYCHAN(channel)						"473 " + channel + " :Cannot join channel (+i)" + ENDLINE
 #define ERR_BADCHANNAME(channel)						"479 " + channel + " :Invalid channel name" + ENDLINE
 #define ERR_NOPRIVILEGES								"481 :Permission Denied- You're not an IRC operator\r\n"
