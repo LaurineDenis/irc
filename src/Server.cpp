@@ -21,6 +21,7 @@ void	Server::init(int ac, char **av)
 	if (this->_port > 65535 || this->_port < 1024) // a check
 	{
 		std::cerr << " 1024 < <port> < 65535" << std::endl;
+		exit(false);
 	}
 }
 
