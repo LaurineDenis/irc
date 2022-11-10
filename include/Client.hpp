@@ -33,6 +33,7 @@ class	Client
 		bool					_pw;
 		bool					_nick;
 		bool					_user;
+		bool					_del;
 		std::string				answer;
 		std::vector<Channel>	*_channels;
 

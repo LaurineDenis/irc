@@ -65,18 +65,11 @@ void	ExecutionManager::command_pass(std::vector<std::string> out, Client *user)
 {
 	std::cout << "command PASS" << std::endl;
 	if (out[1].empty())
-		user->answer = ERR_NEEDMOREPARAMS(user->get_nickname());
+		user->_pw = 0;
 	else if (out[1] != _password)
-		user->answer = ERR_PASSWDMISMATCH(user->get_nickname());
+		user->_pw = 0;
 	else
-	{
 		user->_pw = 1;
-		return;
-	}
-	user->answer += "ERROR : Password mismatch";
-	sendRpl();
-	deleteClient(_clients->size() - 1);
-	std::cout << _clients->size() << std::endl;
 }
 
 void	ExecutionManager::command_privmsg(std::vector<std::string> out, Client *user)
