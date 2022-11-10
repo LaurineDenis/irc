@@ -89,7 +89,7 @@ void	ExecutionManager::command_privmsg(std::vector<std::string> out, Client *use
 			user->answer += ERR_NOSUCHCHANNEL(channel_name);
 		else
 		{
-			if (channel->is_moderated() && channel->is_voice_ok(user))
+			if ((channel->is_moderated() && channel->is_voice_ok(user)) || !channel->is_moderated())
 			{
 				for (unsigned long i = 2; i < out.size(); i++)
 					msg += " " + out[i];

@@ -6,16 +6,16 @@ void	ExecutionManager::command_mode(std::vector<std::string> line, Client *clien
 
 	Channel				*channel;
 	std::string			msg;
-	std::string		str = (line.begin()+1)->data();
+	std::string			str = (line.begin()+1)->data();
 	if ((channel = find_channel(str)) == NULL)
 		client->answer += ERR_NOSUCHCHANNEL(channel->get_name());
 	else
 	{
 		std::string		mode = "itomvb";
 		std::size_t		pos;
-		str = (line.begin()+2)->data();
 		if (check_mode(client, channel, line) == true)
 		{
+			str = (line.begin()+2)->data();
 			if ((pos = mode.find_first_of(str[1], 0)) != std::string::npos)
 				select_mode(client, channel, line, pos);
 			else

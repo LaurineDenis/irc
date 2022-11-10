@@ -232,7 +232,7 @@ void	ExecutionManager::command_part(std::vector<std::string> out, Client *client
 					part_msg = out.at(2);
 				else
 					part_msg = "";
-				send_msg_to_channel_clients(MSG_PART(channel->get_name(), client->get_nickname(), part_msg), client, channel);
+				send_msg_to_all_clients_of_channel(MSG_PART(client->get_nickname(), channel->get_name(), part_msg), client, channel);
 				remove_client_of_channel(channel, client);
 			}
 			else
@@ -249,7 +249,7 @@ void	ExecutionManager::command_kick(std::vector<std::string> out, Client *client
 	std::vector<std::string>	user_names;
 
 	channel_names = parse_channel_name(out, client);
-	for (int i = 0; i < channel_names.size(); i++)
+	for (unsigned long i = 0; i < channel_names.size(); i++)
 	{
 		if ((channel = find_channel(channel_names.at(i))) == NULL)
 			client->answer += ERR_NOSUCHCHANNEL(channel_names.at(i));
@@ -260,7 +260,7 @@ void	ExecutionManager::command_kick(std::vector<std::string> out, Client *client
 				if (channel->is_operator(client) == true)
 				{
 					user_names = split(out.at(2), ",");
-					for (int j = 0; j < user_names.size(); j++)
+					for (unsigned long j = 0; j < user_names.size(); j++)
 					{
 						Client	*clientToKick;
 						if ((clientToKick = find_client(user_names.at(j))) != NULL && is_in_channel(channel, clientToKick) == true)

@@ -39,8 +39,8 @@ class	Client
 
 	private:
 
-		std::string				_nickname;
 		std::string				_name;
+		std::string				_nickname;
 		std::string				_password;
 		std::string				_cmd;
 		int						_nb_channel;

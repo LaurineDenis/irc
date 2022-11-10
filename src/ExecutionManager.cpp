@@ -79,13 +79,12 @@ void		ExecutionManager::newConnection()
 
 void		ExecutionManager::deleteClient(int i)
 {
-	print_infos();
 	Client	*client = &this->_clients->at(i);
 	Channel	*channel;
 	while (this->_clients->at(i)._channels->size())
 	{
 		channel = &this->_channels->at(0);
-		send_msg_to_channel_clients(":" + client->get_nickname() + "!" + client->get_nickname() + "@server PART " + channel->get_name() + ENDLINE, client, channel);
+		send_msg_to_channel_clients(MSG_PART(channel->get_name(), client->get_nickname(), "QUIT server"), client, channel);
 		remove_client_of_channel(channel, client);
 	}
 	this->_clients->erase(this->_clients->cbegin() + i);
@@ -236,6 +235,7 @@ void		ExecutionManager::IO_Operation()
 			this->_clients->at(i - 1).set_cmd("");
 			for (std::vector<std::string>::iterator it = split_cmd.begin(); it != split_cmd.end(); ++it)
 			{
+				print_infos();
 				std::cout << "CMD = |" << it->data() << "|" << std::endl;
 				this->parseCmd(&this->_clients->at(i - 1), it->data(), i - 1);
 				this->sendRpl();
