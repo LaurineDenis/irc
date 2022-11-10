@@ -79,11 +79,6 @@ void		ExecutionManager::newConnection()
 
 void		ExecutionManager::deleteClient(int i)
 {
-	/* supprimer client des channels */
-	/* for (int j = 0; j < _channels.size(); j++) */
-	/* { */
-	/* 	command_part */
-	/* } */
 	Client	*client = &this->_clients->at(i);
 	Channel	*channel;
 	while (this->_clients->at(i)._channels->size())
@@ -95,7 +90,6 @@ void		ExecutionManager::deleteClient(int i)
 	this->_clients->erase(this->_clients->cbegin() + i);
 	close(this->_clientSd.at(i + 1).fd);
 	this->_clientSd.erase(this->_clientSd.cbegin() + i + 1);
-	/* close connection? */
 }
 
 int			ExecutionManager::is_command(std::vector<std::string> line)
@@ -245,6 +239,8 @@ void		ExecutionManager::IO_Operation()
 				std::cout << "CMD = |" << it->data() << "|" << std::endl;
 				this->parseCmd(&this->_clients->at(i - 1), it->data(), i - 1);
 				this->sendRpl();
+				if (_clients->at(i - 1)._del == 1)
+					deleteClient(i - 1);
 			}
 		}
 		else 

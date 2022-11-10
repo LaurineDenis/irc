@@ -1,7 +1,7 @@
 #include "../include/Irc.hpp"
 #include <string>
 
-Client::Client(void) : wlcm_send(0), _nb_channel(0), _nick(0), _user(0), _pw(0)
+Client::Client(void) : wlcm_send(0), _nb_channel(0), _nick(0), _user(0), _pw(0), _del(0)
 {
 	answer = "";
 	_cmd = "";
@@ -9,7 +9,7 @@ Client::Client(void) : wlcm_send(0), _nb_channel(0), _nick(0), _user(0), _pw(0)
 	_channels = new std::vector<Channel>;
 }
 
-Client::Client(Client const &cpy) : wlcm_send(cpy.wlcm_send), _nb_channel(cpy._nb_channel), _nick(cpy._nick), _user(cpy._nick), _pw(cpy._pw)
+Client::Client(Client const &cpy) : wlcm_send(cpy.wlcm_send), _nb_channel(cpy._nb_channel), _nick(cpy._nick), _user(cpy._nick), _pw(cpy._pw), _del(cpy._del)
 {
 	*this = cpy;
 	_channels = cpy._channels;
@@ -96,14 +96,9 @@ void			Client::set_cmd(std::string cmd)
 
 bool		Client::is_register(int cmd)
 {
-	if (cmd == PASS && _pw)
+	if (cmd == PASS && (_user || _nick))
 	{
 		answer += ERR_ALREADYREGISTRED;
-		return false;
-	}
-	if (cmd > PASS && !_pw)
-	{
-		answer += ERR_NOTREGISTERED;
 		return false;
 	}
 	if (cmd > NICK && (!_user || !_nick))

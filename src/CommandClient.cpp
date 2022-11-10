@@ -31,12 +31,21 @@ void	ExecutionManager::command_nick(std::vector<std::string> out, Client *client
 			client->answer = ":" + old_nick + "!" + client->get_name() + "@server NICK " + client->get_nickname() + ENDLINE;
 			for (int i = 0; i < _clients->size(); i++)
 				if(client->get_name() != _clients->at(i).get_name())
-				_clients->at(i).answer = ":" + old_nick +"!" + client->get_name() + "@server NICK " + client->get_nickname() + ENDLINE;
+					_clients->at(i).answer = ":" + old_nick +"!" + client->get_name() + "@server NICK " + client->get_nickname() + ENDLINE;
 		}
 		else if (client->get_name().size() != 0 && !client->wlcm_send)
 		{
-			client->answer = ":server 001 " + client->get_nickname() + " :Welcome to the Internet Relay Network " + client->get_nickname() + "!" + client->get_name() + "@" + _address + ENDLINE;
-			client->wlcm_send = 1;
+			if (client->_pw)
+			{
+				client->answer = ":server 001 " + client->get_nickname() + " :Welcome to the Internet Relay Network " + client->get_nickname() + "!" + client->get_name() + "@" + _address + ENDLINE;
+				client->wlcm_send = 1;
+
+			}
+			else
+			{
+				client->_del = 1;
+				client->answer += ERR_PASSWDMISMATCH(client->get_nickname());
+			}
 		}
 	}
 	else
@@ -87,8 +96,16 @@ void	ExecutionManager::command_client(std::vector<std::string> out, Client *clie
 	client->set_name(out[1]);
 	if (client->get_nickname().size() != 0 && !client->wlcm_send)
 	{
-		client->answer = ":server 001 " + client->get_nickname() + " :Welcome to the Internet Relay Network " + client->get_nickname() + "!" + client->get_name() + "@" + _address + ENDLINE;
-		client->wlcm_send = 1;
+		if (client->_pw)
+		{
+			client->answer = ":server 001 " + client->get_nickname() + " :Welcome to the Internet Relay Network " + client->get_nickname() + "!" + client->get_name() + "@" + _address + ENDLINE;
+			client->wlcm_send = 1;
+		}
+		else 
+		{
+			client->answer = ERR_PASSWDMISMATCH(client->get_nickname());
+			client->_del = 1;
+		}
 	}
 }
 
