@@ -65,23 +65,11 @@ void	ExecutionManager::command_pass(std::vector<std::string> out, Client *user)
 {
 	std::cout << "command PASS" << std::endl;
 	if (out[1].empty())
-	{
-		std::cout << "no password" << std::endl;
-		user->answer += "461 PASS :Not enough parameters\r\n";
-	}
+		user->_pw = 0;
 	else if (out[1] != _password)
-	{
-		std::cout << "wrong password" << std::endl;
-		user->answer += "464 :Password incorrect\r\n";
-	}
+		user->_pw = 0;
 	else
-	{
 		user->_pw = 1;
-		return;
-	}
-	deleteClient(_clients->size() - 1);
-	std::cout << _clients->size() << std::endl;
-	// CLOSE CONNECTION?
 }
 
 void	ExecutionManager::command_privmsg(std::vector<std::string> out, Client *user)

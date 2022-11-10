@@ -1,7 +1,7 @@
 #include "../include/Irc.hpp"
 #include <string>
 
-Client::Client(void) : wlcm_send(0), _nb_channel(0), _nick(0), _user(0), _pw(0)
+Client::Client(void) : wlcm_send(0), _nb_channel(0), _nick(0), _user(0), _pw(0), _del(0)
 {
 	answer = "";
 	_cmd = "";
@@ -9,7 +9,7 @@ Client::Client(void) : wlcm_send(0), _nb_channel(0), _nick(0), _user(0), _pw(0)
 	_channels = new std::vector<Channel>;
 }
 
-Client::Client(Client const &cpy) : wlcm_send(cpy.wlcm_send), _nb_channel(cpy._nb_channel), _nick(cpy._nick), _user(cpy._nick), _pw(cpy._pw)
+Client::Client(Client const &cpy) : wlcm_send(cpy.wlcm_send), _nb_channel(cpy._nb_channel), _nick(cpy._nick), _user(cpy._nick), _pw(cpy._pw), _del(cpy._del)
 {
 	*this = cpy;
 	_channels = cpy._channels;
@@ -59,21 +59,18 @@ void			Client::set_checkPw(bool i)
 
 void			Client::set_nickname(std::string nickname)
 {
-	// std::cout << "Set NickName" << std::endl;
 	if (_nickname != nickname)
 		_nickname = nickname;
 }
 
 void			Client::set_name(std::string name)
 {
-	// std::cout << "Set Name = |" << name << "|" << std::endl;
 	if (_name != name)
 		_name = name;
 }
 
 void			Client::set_password(std::string password)
 {
-	// std::cout << "Set Password" << std::endl;
 	if (_password != password)
 		_password = password;
 }
@@ -99,36 +96,20 @@ void			Client::set_cmd(std::string cmd)
 
 bool		Client::is_register(int cmd)
 {
-	if (cmd == PASS && _pw)
+	if (cmd == PASS && (_user || _nick))
 	{
-		// ERROR
-		return false;
-	}
-	if (cmd > PASS && !_pw)
-	{
-		// ERROR
+		answer += ERR_ALREADYREGISTRED;
 		return false;
 	}
 	if (cmd > NICK && (!_user || !_nick))
 	{
-		// ERROR
+		answer += ERR_NOTREGISTERED;
+		return false;
+	}
+	if (cmd == USER && _user)
+	{
+		answer += ERR_ALREADYREGISTRED;
 		return false;
 	}
 	return true;
 }
-
-/* bool			Client::recvCmd(int fd) */
-/* { */
-/* 	std::string		cmd = ""; */
-/* 	ssize_t			ret = 0; */
-/* 	char			buffer[4096] = {0}; */
-
-/* 	while (cmd.find(ENDLINE, 0) == std::string::npos) */
-/* 	{ */
-/* 		std::cout << cmd.find(ENDLINE, 0) << std::endl; */
-/* 		ret += recv(fd, buffer + ret, sizeof(buffer), 0); */
-/* 		buffer[ret + 1] = 0; */
-/* 		cmd = buffer; */
-/* 	} */
-/* 	return (0); */
-/* } */

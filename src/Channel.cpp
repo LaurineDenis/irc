@@ -8,11 +8,12 @@ Channel::Channel(void)
 	_topic_time = "";
 }
 
-Channel::Channel(Client *creator, std::string name)
+Channel::Channel(Client *creator, std::string name, std::string time)
 {
 	std::cout << "Constructor Channel by name called" << std::endl;
 	_creator = creator;
 	_name = name;
+	_time = time;
 	_clients = new std::vector<Client>;
 	_operator = new std::vector<Client>;
 	_invited = new std::vector<Client>;
@@ -112,6 +113,16 @@ Client			*Channel::get_creator()
 void			Channel::set_creator(Client *client)
 {
 	_creator = client;
+}
+
+std::string Channel::get_time()
+{
+	return _time;
+}
+
+void			Channel::set_time(std::string time)
+{
+	_time = time;
 }
 
 bool			Channel::add_banned(Client *client)

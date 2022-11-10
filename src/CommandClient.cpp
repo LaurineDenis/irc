@@ -29,13 +29,21 @@ void	ExecutionManager::command_nick(std::vector<std::string> out, Client *client
 		{
 			client->answer += MSG_NICK(old_nick, client->get_nickname());
 			for (int i = 0; i < _clients->size(); i++)
-				if (client->get_nickname() != _clients->at(i).get_nickname())
+				if(client->get_name() != _clients->at(i).get_name())
 					_clients->at(i).answer = MSG_NICK(old_nick, client->get_nickname());
 		}
 		else if (client->get_name().size() != 0 && !client->wlcm_send)
 		{
-			client->answer += RPL_WELCOME(client->get_nickname());
-			client->wlcm_send = 1;
+			if (client->_pw)
+			{
+				client->answer += RPL_WELCOME(client->get_nickname());
+				client->wlcm_send = 1;
+			}
+			else
+			{
+				client->_del = 1;
+				client->answer += ERR_PASSWDMISMATCH(client->get_nickname());
+			}
 		}
 	}
 	else
@@ -79,8 +87,16 @@ void	ExecutionManager::command_client(std::vector<std::string> out, Client *clie
 	client->set_name(out[1]);
 	if (client->get_nickname().size() != 0 && !client->wlcm_send)
 	{
-		client->answer = RPL_WELCOME(client->get_nickname());
-		client->wlcm_send = 1;
+		if (client->_pw)
+		{
+			client->answer = RPL_WELCOME(client->get_nickname());
+			client->wlcm_send = 1;
+		}
+		else 
+		{
+			client->answer = ERR_PASSWDMISMATCH(client->get_nickname());
+			client->_del = 1;
+		}
 	}
 }
 

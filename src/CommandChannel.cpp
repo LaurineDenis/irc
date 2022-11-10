@@ -5,7 +5,6 @@
 void	ExecutionManager::change_topic(std::string topic, std::string client, Channel *channel)
 {
 	time_t	rawtime;
-	struct	tm *timeinfo;
 
 	time(&rawtime);
 	channel->set_topic(topic);
@@ -76,10 +75,12 @@ std::vector<std::string>	ExecutionManager::parse_channel_name(std::vector<std::s
 			names.erase(names.begin() + i);
 			// ERROR not a channel name
 		}
-		s.erase(0, 1);
-		if (s.find_first_of(" \7") != std::string::npos)
+		else 
 		{
-			names.erase(names.begin() + i);
+			s.erase(0, 1);
+			if (s.find_first_of(" \7") != std::string::npos)
+				names.erase(names.begin() + i);
+
 		}
 	}
 	return names;
@@ -141,21 +142,20 @@ void	ExecutionManager::command_join(std::vector<std::string> line, Client *clien
 	Channel						*channel;
 	std::string					msg;
 	std::vector<std::string>	channel_names;
+	time_t						rawtime;
 
 	channel_names = parse_channel_name(line, client);
 	for (int i = 0; i < channel_names.size(); i++)
 	{
-		if (check_right_channel(channel_names.at(i), client) == true)
+		channel = find_channel(channel_names.at(i));
+		if (channel == NULL)
 		{
-			if ((channel = find_channel(channel_names.at(i))) == NULL)
-			{
-				channel = new Channel(client, channel_names.at(i));
-				_channels->push_back(*channel);
-			}
-			add_channel_in_client(channel, client);
-			send_topic_reply(client, channel);
-			send_msg_to_channel_clients(MSG_JOIN(channel->get_name(), client->get_nickname()), client, channel);
+			channel = new Channel(client, channel_names.at(i), std::to_string(rawtime));
+			_channels->push_back(*channel);
 		}
+		add_channel_in_client(channel, client);
+		send_topic_reply(client, channel);
+    send_msg_to_channel_clients(MSG_JOIN(channel->get_name(), client->get_nickname()), client, channel);
 	}
 }
 
