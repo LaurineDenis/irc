@@ -9,6 +9,7 @@ class	Server;
 
  enum	Command_list
 {
+	QUIT,
 	PASS,
 	CAP,
 	USER,
@@ -21,7 +22,6 @@ class	Server;
 	KICK,
 	MODE,
 	INVITE,
-	QUIT
 };
 
 class	ExecutionManager {

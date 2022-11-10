@@ -18,13 +18,13 @@ HEADER		= include/Client.hpp include/Server.hpp include/Channel.hpp include/Irc.
 SRCS		= src/Server.cpp src/Command.cpp src/Client.cpp src/Utils.cpp src/Channel.cpp src/Main.cpp src/CommandChannel.cpp src/CommandClient.cpp src/ExecutionManager.cpp src/CommandMode.cpp
 RM			= rm -f
 CC			= clang++
-#CFLAGS		= -Wall -Werror -Wextra -std=c++98 -I.
+CFLAGS		= -Wall -Werror -Wextra -std=c++98 -I.
 
 all:				$(NAME)
 
 $(NAME):			$(OBJS) $(HEADER)
 					@printf "$(ERASE)"
-					@$(CC) $(CFLAGS) $(OBJS) -o $@
+					@$(CC) $(CFLAGS) $(OBJS) -o $@ -fsanitize=address -g3
 					@echo "$(BOLD)$(GREEN)Compilation $(NAME) Succes !$(END)"
 
 %.o: %.cpp $(HEADER)

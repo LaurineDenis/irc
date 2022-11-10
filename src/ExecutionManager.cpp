@@ -25,6 +25,7 @@ void	ExecutionManager::newClient(int newSocket)
 void		ExecutionManager::init_cmd()
 {
 	this->_cmd_name = new std::vector<std::string>;
+	_cmd_name->push_back("QUIT");
 	_cmd_name->push_back("PASS");
 	_cmd_name->push_back("CAP");
 	_cmd_name->push_back("USER");
@@ -37,7 +38,6 @@ void		ExecutionManager::init_cmd()
 	_cmd_name->push_back("KICK");
 	_cmd_name->push_back("MODE");
 	_cmd_name->push_back("INVITE");
-	_cmd_name->push_back("QUIT");
 }
 
 void		ExecutionManager::init(Server *server)
@@ -79,6 +79,7 @@ void		ExecutionManager::newConnection()
 
 void		ExecutionManager::deleteClient(int i)
 {
+	print_infos();
 	Client	*client = &this->_clients->at(i);
 	Channel	*channel;
 	while (this->_clients->at(i)._channels->size())
@@ -89,7 +90,7 @@ void		ExecutionManager::deleteClient(int i)
 	}
 	this->_clients->erase(this->_clients->cbegin() + i);
 	close(this->_clientSd.at(i + 1).fd);
-	this->_clientSd.erase(this->_clientSd.cbegin() + i + 1);
+	this->_clientSd.erase(this->_clientSd.cbegin() + (i + 1));
 }
 
 int			ExecutionManager::is_command(std::vector<std::string> line)
@@ -128,6 +129,9 @@ void		ExecutionManager::dispatchCmd(Client *client, std::vector<std::string> lin
 	std::cout << cmd << std::endl;
 	switch (cmd)
 	{
+		case QUIT :
+			command_quit(client, index);
+			break;
 		case PASS :
 			command_pass(line, client);
 			break;
@@ -164,9 +168,6 @@ void		ExecutionManager::dispatchCmd(Client *client, std::vector<std::string> lin
 		case INVITE :
 			command_invite(line, client);
 			break;
-		case QUIT :
-			command_quit(client, index);
-			break;
 		default :
 			std::cout << "Unknow command" << std::endl;
 	}
@@ -185,7 +186,7 @@ void		ExecutionManager::sendRpl()
 {
 	std::string		answer;
 
-	for (int i = 1; i < this->_clientSd.size(); i++)
+	for (unsigned long i = 1; i < this->_clientSd.size(); i++)
 	{
 		if (this->_clients->at(i - 1).answer.length())
 		{
@@ -219,16 +220,15 @@ ssize_t		ExecutionManager::recvCmd(int i)
 void		ExecutionManager::IO_Operation()
 {
 	ssize_t						to_process;
-	ssize_t						ret;
 	std::vector<std::string>	split_cmd;
 
-	for (int i = 1; i < this->_clientSd.size(); i++)
+	for (unsigned long i = 1; i < this->_clientSd.size(); i++)
 	{
 		to_process = this->recvCmd(i);
 		if (to_process == -1)
 		{
 			std::cout << "Client " << this->_clientSd.at(i).fd << " disconnected!" << std::endl;
-			command_quit(&this->_clients->at(i - 1), i - 1);
+			deleteClient(i - 1);
 		}
 		else if (to_process)
 		{
