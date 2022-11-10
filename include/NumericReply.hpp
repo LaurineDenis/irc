@@ -7,7 +7,6 @@
 
 // ERROR REPLIES 1459
 #define ERR_NOSUCHNICK(nickname)						"401 " + nickname + " :No such nick/channel" + ENDLINE
-#define ERR_NOSUCHCHANNEL(channel)						"403 " + channel + " :No such channel" + ENDLINE
 #define ERR_UNKNOWNCOMMAND(command)						"421 " + command + " :Unknown command" + ENDLINE
 #define ERR_NONICKNAMEGIVEN								"431 :No nickname given\n\r"
 #define ERR_ERRONEUSNICKNAME(nickname)					"432 " + nickname + " :Erroneous nickname" + ENDLINE		
@@ -29,6 +28,7 @@
 #define ERR_ALREADYREGISTRED							"462 :Unauthorized command (already registered)\r\n"
 #define ERR_PASSWDMISMATCH(nickname)					"464 " + nickname + " :Password incorrect\r\n"
 #define ERR_INVITEONLYCHAN(channel)						"473 " + channel + " :Cannot join channel (+i)" + ENDLINE
+#define ERR_BANNEDFROMCHAN(channel)						"474 " + channel + " :Cannot join channel (+b)" + ENDLINE
 #define ERR_BADCHANNAME(channel)						"479 " + channel + " :Invalid channel name" + ENDLINE
 #define ERR_NOPRIVILEGES								"481 :Permission Denied- You're not an IRC operator\r\n"
 
@@ -40,11 +40,14 @@
 #define RPL_CHANNELMODEIS(nickname, channel, mode, mode_params)	"324 " + nickname + " " + channel + " :" + mode + mode_params + ENDLINE
 #define RPL_NOTOPIC(nickname, channel) 					"331 " + nickname + " " + channel + " :No topic is set" + ENDLINE
 #define RPL_TOPIC(nickname, channel, topic) 			"332 " + nickname + " " + channel + " :" + topic + ENDLINE
+#define RPL_TOPICWHOTIME(nickname, channel, topic_client, topic_time) "333 " + nickname + " " + channel + " " + topic_client + " " + topic_time + ENDLINE
 #define RPL_NAMREPLY(channel, nickname, members)		"353 " + nickname + " " + channel + " :" + members + ENDLINE
 #define RPL_INVITING(inviting, channel, invited)		"341 " + inviting + " " + invited + " " + channel + ENDLINE
 #define RPL_ENDOFNAMES(channel, nickname)				"366 " + nickname + " " + channel + " :End of /NAMES list" + ENDLINE
 #define RPL_MOTD(nickname, message)						"372 " + nickname + " :" + message + ENDLINE
 #define RPL_ENDOFMOTD(nickname)							"376 " + nickname + " :End of message of the day." + ENDLINE
+#define RPL_ENDOFBANLIST(nickname, channel)             "368 " + nickname + " " + channel + ENDLINE
+#define RPL_BANLIST(nickname, channel, lst)             "367 " + nickname + " " + channel + " " + lst + ENDLINE;
 
 // MSG_BUILDER
 #define MSG_JOIN(channel, nickname)						":" + nickname + " JOIN " + channel + ENDLINE
@@ -56,6 +59,8 @@
 #define MSG_KILL(nickname, message)						":bot KILL " + nickname + " " + message + ENDLINE
 #define MSG_PRIVMSG(sender, recipient, msg)				":" + sender + " PRIVMSG " + recipient + " " + msg + ENDLINE
 #define MSG_NOTICE(sender, recipient, msg)				":" + sender + " NOTICE " + recipient + " " + msg + ENDLINE
+#define MSG_MODE_DETAILS(nickname, channel, mode, params) ":" + nickname +" MODE " + channel + " " + mode + params + ENDLINE
+
 
 // #define MSG_NOTICE(rpl, sending_nickname, recipient, msg)	rpl + ":" + sending_nickname + " NOTICE " + recipient + " :" + msg + ENDLINE
 

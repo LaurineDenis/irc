@@ -1,4 +1,4 @@
-#include "../include/Server.hpp"
+#include "../include/Irc.hpp"
 
 void	ExecutionManager::print_infos()
 {
@@ -44,7 +44,7 @@ void	ExecutionManager::send_msg_to_channel_clients(std::string msg, Client *user
 		for (std::vector<Channel>::iterator it_channel = it_client->_channels->begin(); it_channel != it_client->_channels->end(); it_channel++)
 		{
 			if (it_channel->get_name() == channel->get_name() && it_client->get_nickname() != user->get_nickname())
-				it_client->answer = msg;
+				it_client->answer += msg;
 		}
 	}
 }
@@ -56,7 +56,7 @@ void	ExecutionManager::send_msg_to_all_clients_of_channel(std::string msg, Clien
 		for (std::vector<Channel>::iterator it_channel = it_client->_channels->begin(); it_channel != it_client->_channels->end(); it_channel++)
 		{
 			if (it_channel->get_name() == channel->get_name())
-				it_client->answer = msg;
+				it_client->answer += msg;
 		}
 	}
 }
@@ -80,32 +80,31 @@ void	ExecutionManager::command_privmsg(std::vector<std::string> out, Client *use
 	std::string	channel_name;
 	std::string	msg;
 
-	//channel case
 	if (out[1][0] == '#')
 	{
 		channel_name = out[1];
 		if ((channel = find_channel(channel_name)) == NULL)
-			user->answer = out[1] + " No such channel" + ENDLINE;
+			user->answer += ERR_NOSUCHCHANNEL(channel_name);
 		else
 		{
 			if (channel->is_moderated() && channel->is_voice_ok(user))
 			{
 				for (int i = 2; i < out.size(); i++)
 					msg += " " + out[i];
-				send_msg_to_channel_clients(":" + user->get_nickname() + "!" + user->get_name() + "@server PRIVMSG " + channel->get_name() + " " + msg + ENDLINE, user, channel);
+				send_msg_to_channel_clients(MSG_PRIVMSG(user->get_nickname(), channel->get_name(), msg), user, channel);
 			}
 			else
-				user->answer = ":server 404 " + user->get_nickname() + " " + channel->get_name() + " :Cannot send to channel" + ENDLINE;
+				user->answer += ERR_CANNOTSENDTOCHAN(channel->get_name());
 		}
 	}
 	else if((other_user = find_client(out[1])) != NULL)
 	{
 		for (int i = 2; i < out.size(); i++)
 				msg += " " + out[i];
-		send_msg_to_client(":" + other_user->get_nickname() + "!" + other_user->get_name() + "@server PRIVMSG "+ user->get_nickname()+ " :" + msg + ENDLINE, other_user);
+		send_msg_to_client(MSG_PRIVMSG(user->get_nickname(), other_user->get_nickname(), msg), other_user);
 	}
 	else
-		user->answer = out[1] + " No such channel" + ENDLINE;
+		user->answer += ERR_NOSUCHNICK(user->get_nickname());
 }
 
 Channel	*ExecutionManager::find_channel(std::string channel_name)

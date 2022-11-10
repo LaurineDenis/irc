@@ -58,7 +58,8 @@ class	ExecutionManager {
 		ssize_t		recvCmd(int i);
 		bool	check_right_channel(std::string channel_name, Client *client);
 		//command
-		std::vector<std::string>	parse_channel_name(std::vector<std::string> channel_name);
+		std::vector<std::string>	parse_channel_name(std::vector<std::string> channel_name, Client *client);
+		std::vector<std::string>	parse_user_name(std::vector<std::string> channel_name);
 		void	command_pass(std::vector<std::string> out, Client *client);
 		void	command_cap(std::vector<std::string> out);
 		void	command_ping(std::vector<std::string> out, Client *client);
@@ -84,7 +85,7 @@ class	ExecutionManager {
 		void	change_topic(std::string topic, std::string client, Channel *channel);
 		void	send_msg_to_all_clients_of_channel(std::string msg, Client *client, Channel *channel);
 		void	send_msg_to_channel_clients(std::string msg, Client *client, Channel *channel);
-		void	send_msg_to_client(std::string msg, Client *other_client);
+		void	send_msg_to_client(std::string msg, Client *client);
 		void	print_infos();
 		Client	*find_client(std::string nickname);
 		Channel	*find_channel(std::string channel_name);
