@@ -138,31 +138,20 @@ void	ExecutionManager::command_join(std::vector<std::string> line, Client *clien
 	std::vector<std::string>	channel_names;
 	time_t						rawtime;
 
-<<<<<<< HEAD
-	//Affichage
-	/* for (std::vector<std::string>::iterator it = line.begin(); it != line.end(); ++it) */
-	/* 	std::cout << "|" << *it << "|" << std::endl; */
-=======
-
->>>>>>> e84a50b25038519ae50140d7d5fd9be468aa6d34
 	line.resize(2);
 	channel_names = parse_channel_name(line);
 	for (int i = 0; i < channel_names.size(); i++)
 	{
-		if (check_right_channel(channel_names.at(i), client) == true)
+		channel = find_channel(channel_names.at(i));
+		if (channel == NULL)
 		{
-			time(&rawtime);
 			channel = new Channel(client, channel_names.at(i), std::to_string(rawtime));
 			_channels->push_back(*channel);
-			if ((channel = find_channel(channel_names.at(i))) == NULL)
-			{
-				channel = new Channel(client, channel_names.at(i));
-				_channels->push_back(*channel);
-			}
-			add_channel_in_client(channel, client);
-			send_topic_reply(client, channel);
-			send_msg_to_channel_clients(":" + client->get_nickname() + "!" + client->get_nickname() + "@server JOIN " + channel->get_name() + ENDLINE, client, channel);
 		}
+		add_channel_in_client(channel, client);
+		send_topic_reply(client, channel);
+		send_msg_to_channel_clients(":" + client->get_nickname() + "!" + client->get_nickname() + "@server JOIN " + channel->get_name() + ENDLINE, client, channel);
+		std::cout << _channels->size() << std::endl;
 	}
 }
 
