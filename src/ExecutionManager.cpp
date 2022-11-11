@@ -79,18 +79,20 @@ void		ExecutionManager::newConnection()
 
 void		ExecutionManager::deleteClient(int i)
 {
-	print_infos();
 	Client	*client = &this->_clients->at(i);
 	Channel	*channel;
-	while (this->_clients->at(i)._channels->size())
+
+	for (int j = this->_clients->at(i)._channels->size() - 1; j >= 0; j--)
 	{
-		channel = &this->_channels->at(0);
+		channel = &this->_clients->at(i)._channels->at(j);
 		send_msg_to_channel_clients(":" + client->get_nickname() + "!" + client->get_nickname() + "@server PART " + channel->get_name() + ENDLINE, client, channel);
 		remove_client_of_channel(channel, client);
 	}
 	this->_clients->erase(this->_clients->cbegin() + i);
 	close(this->_clientSd.at(i + 1).fd);
+	std::cout << "i == " << i << std::endl;
 	this->_clientSd.erase(this->_clientSd.cbegin() + (i + 1));
+	print_infos();
 }
 
 int			ExecutionManager::is_command(std::vector<std::string> line)
@@ -186,6 +188,7 @@ void		ExecutionManager::sendRpl()
 {
 	std::string		answer;
 
+	std::cout << this->_clientSd.size() << " == Sd size" << std::endl;
 	for (unsigned long i = 1; i < this->_clientSd.size(); i++)
 	{
 		if (this->_clients->at(i - 1).answer.length())
@@ -229,6 +232,8 @@ void		ExecutionManager::IO_Operation()
 		{
 			std::cout << "Client " << this->_clientSd.at(i).fd << " disconnected!" << std::endl;
 			deleteClient(i - 1);
+			std::cout << "SD size in io == " << _clientSd.size() << std::endl;
+			sendRpl();
 		}
 		else if (to_process)
 		{
@@ -238,9 +243,9 @@ void		ExecutionManager::IO_Operation()
 			{
 				std::cout << "CMD = |" << it->data() << "|" << std::endl;
 				this->parseCmd(&this->_clients->at(i - 1), it->data(), i - 1);
-				this->sendRpl();
 				if (_clients->at(i - 1)._del == 1)
 					deleteClient(i - 1);
+				this->sendRpl();
 			}
 		}
 		else 
