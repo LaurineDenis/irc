@@ -51,7 +51,7 @@
 
 // MSG_BUILDER
 #define MSG_JOIN(channel, nickname)						":" + nickname + " JOIN " + channel + ENDLINE
-#define MSG_PART(channel, nickname, part_msg)			":" + nickname + " PART " + channel +  " " + part_msg + ENDLINE
+#define MSG_PART(nickname, channel, part_msg)			":" + nickname + " PART " + channel +  " " + part_msg + ENDLINE
 #define MSG_KICK(operator, channel, kicked, kick_msg)	":" + operator + " KICK " + channel +  " " + kicked + " " + kick_msg + ENDLINE
 #define MSG_INVITE(inviting, invited, channel)			":" + inviting + " INVITE " + invited +  " " + channel + ENDLINE
 #define MSG_NICK(old_nickname, new_nickname)			":" + old_nickname + " NICK " + new_nickname + ENDLINE

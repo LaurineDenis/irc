@@ -18,6 +18,7 @@ void	ExecutionManager::newClient(int newSocket)
 
 	this->_clientAmount++;
 	fcntl(newSocket, F_SETFL, O_NONBLOCK);
+	std::cout << "Creation de client 1 a ladresse : " << client << std::endl; 
 	this->_clients->push_back(*client);
 	this->addSd(newSocket, POLLIN);
 }
@@ -86,10 +87,11 @@ void		ExecutionManager::deleteClient(int i)
 	for (int j = this->_clients->at(i)._channels->size() - 1; j >= 0; j--)
 	{
 		channel = &this->_clients->at(i)._channels->at(j);
-		send_msg_to_channel_clients(":" + client->get_nickname() + "!" + client->get_nickname() + "@server PART " + channel->get_name() + ENDLINE, client, channel);
+		send_msg_to_channel_clients(MSG_PART(channel->get_name(), client->get_nickname(), "QUIT server", client, channel);
 		remove_client_of_channel(channel, client);
 	}
 	this->_clients->erase(this->_clients->cbegin() + i);
+	::operator delete(client);
 	close(this->_clientSd.at(i + 1).fd);
 	this->_clientSd.erase(this->_clientSd.cbegin() + (i + 1));
 	print_infos();
@@ -181,7 +183,11 @@ void		ExecutionManager::shutdown()
 {
 	std::cout << "Shutting down server ..." << std::endl;
 	_clients->clear();
+	delete _clients;
 	_channels->clear();
+	delete _channels;
+	_cmd_name->clear();
+	delete _cmd_name;
 	close(_clientSd.at(0).fd);
 	_clientSd.clear();
 }
@@ -246,6 +252,7 @@ void		ExecutionManager::IO_Operation()
 				if (_clients->at(i - 1)._del == 1)
 					deleteClient(i - 1);
 				this->sendRpl();
+				print_infos();
 			}
 		}
 		else 

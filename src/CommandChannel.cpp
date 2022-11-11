@@ -187,6 +187,7 @@ void	ExecutionManager::delete_channel(Channel *channel)
 		if (channel->get_name() == _channels->at(i).get_name())
 		{
 			_channels->erase(_channels->begin() + i);
+			::operator delete(channel);
 			break ;
 		}
 	}
@@ -232,7 +233,7 @@ void	ExecutionManager::command_part(std::vector<std::string> out, Client *client
 					part_msg = out.at(2);
 				else
 					part_msg = "";
-				send_msg_to_channel_clients(MSG_PART(channel->get_name(), client->get_nickname(), part_msg), client, channel);
+				send_msg_to_all_clients_of_channel(MSG_PART(client->get_nickname(), channel->get_name(), part_msg), client, channel);
 				remove_client_of_channel(channel, client);
 			}
 			else

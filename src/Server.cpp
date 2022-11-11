@@ -60,7 +60,7 @@ void	Server::signalHandler(int sig)
 {
 	if (sig == SIGINT)
 		_shutdown = 1;
-	exit (EXIT_SUCCESS);
+	// exit (EXIT_SUCCESS);
 }
 
 void	Server::run(ExecutionManager *exec)
