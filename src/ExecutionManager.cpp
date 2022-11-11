@@ -90,7 +90,6 @@ void		ExecutionManager::deleteClient(int i)
 	}
 	this->_clients->erase(this->_clients->cbegin() + i);
 	close(this->_clientSd.at(i + 1).fd);
-	std::cout << "i == " << i << std::endl;
 	this->_clientSd.erase(this->_clientSd.cbegin() + (i + 1));
 	print_infos();
 }
@@ -188,7 +187,6 @@ void		ExecutionManager::sendRpl()
 {
 	std::string		answer;
 
-	std::cout << this->_clientSd.size() << " == Sd size" << std::endl;
 	for (unsigned long i = 1; i < this->_clientSd.size(); i++)
 	{
 		if (this->_clients->at(i - 1).answer.length())
@@ -232,7 +230,6 @@ void		ExecutionManager::IO_Operation()
 		{
 			std::cout << "Client " << this->_clientSd.at(i).fd << " disconnected!" << std::endl;
 			deleteClient(i - 1);
-			std::cout << "SD size in io == " << _clientSd.size() << std::endl;
 			sendRpl();
 		}
 		else if (to_process)
