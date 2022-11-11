@@ -38,6 +38,7 @@ void		ExecutionManager::init_cmd()
 	_cmd_name->push_back("KICK");
 	_cmd_name->push_back("MODE");
 	_cmd_name->push_back("INVITE");
+	_cmd_name->push_back("NOTICE");
 }
 
 void		ExecutionManager::init(Server *server)
@@ -167,6 +168,9 @@ void		ExecutionManager::dispatchCmd(Client *client, std::vector<std::string> lin
 			break;
 		case INVITE :
 			command_invite(line, client);
+			break;
+		case NOTICE :
+			command_notice(line, client);
 			break;
 		default :
 			std::cout << "Unknow command" << std::endl;

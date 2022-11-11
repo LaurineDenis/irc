@@ -74,6 +74,41 @@ void	ExecutionManager::command_pass(std::vector<std::string> out, Client *user)
 		user->_pw = 1;
 }
 
+void	ExecutionManager::command_notice(std::vector<std::string> out, Client *user)
+{
+	std::cout << "command Privmsg" << std::endl;
+	Channel		*channel;
+	Client		*other_user;
+	std::string	channel_name;
+	std::string	msg;
+
+	if (out[1][0] == '#')
+	{
+		channel_name = out[1];
+		if ((channel = find_channel(channel_name)) == NULL)
+			user->answer += ERR_NOSUCHCHANNEL(channel_name);
+		else
+		{
+			if ((channel->is_moderated() && channel->is_voice_ok(user)) || !channel->is_moderated())
+			{
+				for (unsigned long i = 2; i < out.size(); i++)
+					msg += " " + out[i];
+				send_msg_to_channel_clients(MSG_NOTICE(user->get_nickname(), channel->get_name(), msg), user, channel);
+			}
+			else
+				user->answer += ERR_CANNOTSENDTOCHAN(channel->get_name());
+		}
+	}
+	else if((other_user = find_client(out[1])) != NULL)
+	{
+		for (unsigned long i = 2; i < out.size(); i++)
+				msg += " " + out[i];
+		send_msg_to_client(MSG_NOTICE(user->get_nickname(), other_user->get_nickname(), msg), other_user);
+	}
+	else
+		user->answer += ERR_NOSUCHNICK(user->get_nickname());
+}
+
 void	ExecutionManager::command_privmsg(std::vector<std::string> out, Client *user)
 {
 	std::cout << "command Privmsg" << std::endl;
