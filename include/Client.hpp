@@ -28,7 +28,6 @@ class	Client
 		void					set_checkPw(bool i);
 		void					set_cmd(std::string cmd);
 		bool					is_register(int cmd);
-		/* bool					recvCmd(int fd); */
 		bool					wlcm_send;
 		bool					_pw;
 		bool					_nick;

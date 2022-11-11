@@ -9,19 +9,22 @@ Client::Client(void) : wlcm_send(0), _pw(0), _nick(0), _user(0), _del(0), _nb_ch
 	_channels = new std::vector<Channel>;
 }
 
-Client::Client(Client const &cpy) : wlcm_send(cpy.wlcm_send), _pw(cpy._pw), _nick(cpy._nick), _user(cpy._nick), _del(cpy._del), _nb_channel(cpy._nb_channel)
+Client::Client(Client const &cpy)
 {
 	*this = cpy;
-	_channels = cpy._channels;
 }
 
 Client::~Client(void)
 {
+	// _channels->clear();
+	// delete _channels;
 	std::cout << "Destructor Client called" << std::endl;
 }
 
 Client	&Client::operator=(Client const &src)
 {
+	if (this == &src)
+		return (*this);
 	this->_name = src._name;
 	this->_nickname = src._nickname;
 	this->_password = src._password;

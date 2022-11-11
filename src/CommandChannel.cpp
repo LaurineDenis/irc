@@ -187,6 +187,7 @@ void	ExecutionManager::delete_channel(Channel *channel)
 		if (channel->get_name() == _channels->at(i).get_name())
 		{
 			_channels->erase(_channels->begin() + i);
+			::operator delete(channel);
 			break ;
 		}
 	}

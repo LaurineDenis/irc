@@ -61,7 +61,7 @@ class	Channel
 		bool					_invite_only;
 		bool					_mode_topic;
 		bool					_moderated;
-		std::string		_time;
+		std::string				_time;
 };
 
 #endif
