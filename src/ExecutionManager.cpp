@@ -38,6 +38,7 @@ void		ExecutionManager::init_cmd()
 	_cmd_name->push_back("KICK");
 	_cmd_name->push_back("MODE");
 	_cmd_name->push_back("INVITE");
+	_cmd_name->push_back("NOTICE");
 }
 
 void		ExecutionManager::init(Server *server)
@@ -90,7 +91,6 @@ void		ExecutionManager::deleteClient(int i)
 	}
 	this->_clients->erase(this->_clients->cbegin() + i);
 	close(this->_clientSd.at(i + 1).fd);
-	std::cout << "i == " << i << std::endl;
 	this->_clientSd.erase(this->_clientSd.cbegin() + (i + 1));
 	print_infos();
 }
@@ -128,7 +128,6 @@ void		ExecutionManager::parseCmd(Client *client, std::string buffer, int index)
 
 void		ExecutionManager::dispatchCmd(Client *client, std::vector<std::string> line, int index, int cmd)
 {
-	std::cout << cmd << std::endl;
 	switch (cmd)
 	{
 		case QUIT :
@@ -170,6 +169,9 @@ void		ExecutionManager::dispatchCmd(Client *client, std::vector<std::string> lin
 		case INVITE :
 			command_invite(line, client);
 			break;
+		case NOTICE :
+			command_notice(line, client);
+			break;
 		default :
 			std::cout << "Unknow command" << std::endl;
 	}
@@ -188,12 +190,11 @@ void		ExecutionManager::sendRpl()
 {
 	std::string		answer;
 
-	std::cout << this->_clientSd.size() << " == Sd size" << std::endl;
 	for (unsigned long i = 1; i < this->_clientSd.size(); i++)
 	{
 		if (this->_clients->at(i - 1).answer.length())
 		{
-			answer = this->_clients->at(i - 1).answer + ENDLINE;
+			answer = this->_clients->at(i - 1).answer;
 			std::cout <<  "Reply sent: " << answer.c_str() << std::endl;
 			send(this->_clientSd.at(i).fd, answer.c_str(), answer.length(), 0);
 			this->_clients->at(i - 1).answer = "";
@@ -232,7 +233,6 @@ void		ExecutionManager::IO_Operation()
 		{
 			std::cout << "Client " << this->_clientSd.at(i).fd << " disconnected!" << std::endl;
 			deleteClient(i - 1);
-			std::cout << "SD size in io == " << _clientSd.size() << std::endl;
 			sendRpl();
 		}
 		else if (to_process)

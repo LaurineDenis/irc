@@ -22,6 +22,7 @@ class	Server;
 	KICK,
 	MODE,
 	INVITE,
+	NOTICE,
 };
 
 class	ExecutionManager {
@@ -73,6 +74,7 @@ class	ExecutionManager {
 		void	command_mode(std::vector<std::string> out, Client *user);
 		void	command_invite(std::vector<std::string> out, Client *user);
 		void	command_quit(Client *client, int index);
+		void	command_notice(std::vector<std::string>out, Client *client);
 		//mode
 		void	select_mode(Client *client, Channel *channel, std::vector<std::string> line, std::size_t pos);
 		bool	check_mode(Client *client, Channel *channel, std::vector<std::string> line);
