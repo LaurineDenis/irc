@@ -127,7 +127,6 @@ void		ExecutionManager::parseCmd(Client *client, std::string buffer, int index)
 
 void		ExecutionManager::dispatchCmd(Client *client, std::vector<std::string> line, int index, int cmd)
 {
-	std::cout << cmd << std::endl;
 	switch (cmd)
 	{
 		case QUIT :
@@ -191,7 +190,7 @@ void		ExecutionManager::sendRpl()
 	{
 		if (this->_clients->at(i - 1).answer.length())
 		{
-			answer = this->_clients->at(i - 1).answer + ENDLINE;
+			answer = this->_clients->at(i - 1).answer;
 			std::cout <<  "Reply sent: " << answer.c_str() << std::endl;
 			send(this->_clientSd.at(i).fd, answer.c_str(), answer.length(), 0);
 			this->_clients->at(i - 1).answer = "";
