@@ -24,7 +24,7 @@ all:				$(NAME)
 
 $(NAME):			$(OBJS) $(HEADER)
 					@printf "$(ERASE)"
-					@$(CC) $(CFLAGS) $(OBJS) -o $@ 
+					@$(CC) $(CFLAGS) $(OBJS) -o $@ -fsanitize=address -g3
 					@echo "$(BOLD)$(GREEN)Compilation $(NAME) Succes !$(END)"
 
 %.o: %.cpp $(HEADER)

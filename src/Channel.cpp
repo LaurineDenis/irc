@@ -39,12 +39,10 @@ Channel::Channel(Channel const &cpy)
 Channel		&Channel::operator=(Channel const &cpy)
 {
 	std::cout << "Channel operator = called" << std::endl;
-	if (this == &cpy)
-		return (*this);
 	_clients = new std::vector<Client>;
 	_operator = new std::vector<Client>;
-	_invited = new std::vector<Client>;
 	_banned = new std::vector<Client>;
+	_invited = new std::vector<Client>;
 	_voice_ok = new std::vector<Client>;
 	_creator = cpy._creator;
 	_operator = cpy._operator;
@@ -64,16 +62,6 @@ Channel		&Channel::operator=(Channel const &cpy)
 
 Channel::~Channel(void)
 {
-	_clients->clear();
-	delete _clients;
-	_operator->clear();
-	delete _operator;
-	_banned->clear();
-	delete _banned;
-	_invited->clear();
-	delete _invited;
-	_voice_ok->clear();
-	delete _voice_ok;
 	std::cout << "Destructor Channel " << _name << " called" << std::endl;
 }
 

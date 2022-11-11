@@ -147,16 +147,19 @@ void	ExecutionManager::command_join(std::vector<std::string> line, Client *clien
 	channel_names = parse_channel_name(line, client);
 	for (unsigned long i = 0; i < channel_names.size(); i++)
 	{
-		channel = find_channel(channel_names.at(i));
-		if (channel == NULL)
+		if (check_right_channel(channel_names.at(i), client))
 		{
-			time(&rawtime);
-			channel = new Channel(client, channel_names.at(i), std::to_string(rawtime));
-			_channels->push_back(*channel);
+			channel = find_channel(channel_names.at(i));
+			if (channel == NULL)
+			{
+				time(&rawtime);
+				channel = new Channel(client, channel_names.at(i), std::to_string(rawtime));
+				_channels->push_back(*channel);
+			}
+			add_channel_in_client(channel, client);
+			send_topic_reply(client, channel);
+			send_msg_to_channel_clients(MSG_JOIN(channel->get_name(), client->get_nickname()), client, channel);
 		}
-		add_channel_in_client(channel, client);
-		send_topic_reply(client, channel);
-    send_msg_to_channel_clients(MSG_JOIN(channel->get_name(), client->get_nickname()), client, channel);
 	}
 }
 
@@ -187,7 +190,6 @@ void	ExecutionManager::delete_channel(Channel *channel)
 		if (channel->get_name() == _channels->at(i).get_name())
 		{
 			_channels->erase(_channels->begin() + i);
-			::operator delete(channel);
 			break ;
 		}
 	}
@@ -227,13 +229,12 @@ void	ExecutionManager::command_part(std::vector<std::string> out, Client *client
 		{
 			if (is_in_channel(channel, client))
 			{
-				// client->answer += ":" + client->get_nickname() + "!" + client->get_name() + "@server PART " + channel->get_name() + ENDLINE;
 				std::string	part_msg;
 				if (out.size() >= 3)
 					part_msg = out.at(2);
 				else
 					part_msg = "";
-				send_msg_to_all_clients_of_channel(MSG_PART(client->get_nickname(), channel->get_name(), part_msg), client, channel);
+				send_msg_to_all_clients_of_channel(MSG_PART(channel->get_name(), client->get_nickname(), part_msg), client, channel);
 				remove_client_of_channel(channel, client);
 			}
 			else

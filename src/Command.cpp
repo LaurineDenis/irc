@@ -25,7 +25,7 @@ void	ExecutionManager::print_infos()
 	{
 		for (std::vector<Client>::iterator it = _clients->begin(); it != _clients->end(); it++)
 		{
-			std::cout << "\t" << it->get_nickname()<< std::endl;
+			std::cout << "\t" << it->get_nickname() << std::endl;
 			if (it->get_nb_channel() != 0)
 			{
 				std::cout << "\t\tChannel in user" << std::endl;
