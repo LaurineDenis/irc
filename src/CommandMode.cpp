@@ -6,8 +6,13 @@ void	ExecutionManager::command_mode(std::vector<std::string> line, Client *clien
 
 	Channel				*channel;
 	std::string			msg;
-	std::string			str = (line.begin()+1)->data();
-	if ((channel = find_channel(str)) == NULL)
+	std::string			str;
+
+	if (line.size() >= 2)
+		str = (line.begin() + 1)->data();
+	if (line.size() < 2)
+		client->answer += ERR_NOSUCHCHANNEL(str);
+	else if ((channel = find_channel(str)) == NULL)
 		client->answer += ERR_NOSUCHCHANNEL(channel->get_name());
 	else
 	{
@@ -15,7 +20,7 @@ void	ExecutionManager::command_mode(std::vector<std::string> line, Client *clien
 		std::size_t		pos;
 		if (check_mode(client, channel, line) == true)
 		{
-			str = (line.begin()+2)->data();
+			str = (line.begin() + 2)->data();
 			if ((pos = mode.find_first_of(str[1], 0)) != std::string::npos)
 				select_mode(client, channel, line, pos);
 			else
