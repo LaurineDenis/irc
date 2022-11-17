@@ -119,6 +119,7 @@ void	ExecutionManager::command_privmsg(std::vector<std::string> out, Client *use
 
 	if (out[1][0] == '#')
 	{
+		std::cout << "WTF?" << std::endl;
 		channel_name = out[1];
 		if ((channel = find_channel(channel_name)) == NULL)
 			user->answer += ERR_NOSUCHCHANNEL(channel_name);
@@ -136,6 +137,7 @@ void	ExecutionManager::command_privmsg(std::vector<std::string> out, Client *use
 	}
 	else if((other_user = find_client(out[1])) != NULL)
 	{
+		std::cout << "WTF?1" << std::endl;
 		for (unsigned long i = 2; i < out.size(); i++)
 				msg += " " + out[i];
 		send_msg_to_client(MSG_PRIVMSG(user->get_nickname(), other_user->get_nickname(), msg), other_user);

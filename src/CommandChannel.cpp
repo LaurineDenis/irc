@@ -232,7 +232,7 @@ void	ExecutionManager::command_part(std::vector<std::string> out, Client *client
 					part_msg = out.at(2);
 				else
 					part_msg = "";
-				send_msg_to_channel_clients(MSG_PART(channel->get_name(), client->get_nickname(), part_msg), client, channel);
+				send_msg_to_all_clients_of_channel(MSG_PART(channel->get_name(), client->get_nickname(), part_msg), client, channel);
 				remove_client_of_channel(channel, client);
 			}
 			else
