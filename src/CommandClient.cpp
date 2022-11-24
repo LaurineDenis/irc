@@ -94,7 +94,7 @@ void	ExecutionManager::command_client(std::vector<std::string> out, Client *clie
 			client->_del = 1;
 		}
 	}
-	else 
+	else if (client->wlcm_send)
 		client->answer += ERR_ALREADYREGISTRED;
 }
 
