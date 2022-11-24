@@ -176,14 +176,16 @@ void	ExecutionManager::mode_voice(Client *client, Channel *channel, std::vector<
         other_client = find_client(line.at(3).data());
         channel->add_voice_ok(other_client);
 		client->answer += MSG_MODE_DETAILS(client->get_nickname(), channel->get_name(), " +v ", other_client->get_nickname());
-		other_client->answer += MSG_MODE_DETAILS(client->get_nickname(), channel->get_name(), " +v ", other_client->get_nickname());
+		if (client->get_nickname() != other_client->get_nickname())
+			other_client->answer += MSG_MODE_DETAILS(client->get_nickname(), channel->get_name(), " +v ", other_client->get_nickname());
     }
     else if (line.at(2).at(0) == '-')
     {
 		other_client = find_client(line.at(3).data());
 		channel->remove_voice_ok(other_client);
 		client->answer += MSG_MODE_DETAILS(client->get_nickname(), channel->get_name(), " -v ", other_client->get_nickname());
-		other_client->answer += MSG_MODE_DETAILS(client->get_nickname(), channel->get_name(), " -v ", other_client->get_nickname());
+		if (client->get_nickname() != other_client->get_nickname())
+			other_client->answer += MSG_MODE_DETAILS(client->get_nickname(), channel->get_name(), " -v ", other_client->get_nickname());
 	}
 }
 

@@ -74,6 +74,19 @@ void	ExecutionManager::command_pass(std::vector<std::string> out, Client *user)
 		user->_pw = 1;
 }
 
+bool	ExecutionManager::can_i_speak(Channel *channel, Client *client)
+{
+	if (is_in_channel(channel, client))
+	{
+		if ((channel->is_moderated() && channel->is_voice_ok(client)) || !channel->is_moderated())
+		{
+			if (!channel->is_banned(client))
+				return (true);
+		}
+	}
+	return (false);
+}
+
 void	ExecutionManager::command_notice(std::vector<std::string> out, Client *user)
 {
 	std::cout << "command Notice" << std::endl;
@@ -89,7 +102,7 @@ void	ExecutionManager::command_notice(std::vector<std::string> out, Client *user
 			user->answer += ERR_NOSUCHCHANNEL(channel_name);
 		else
 		{
-			if ((channel->is_moderated() && channel->is_voice_ok(user)) || !channel->is_moderated())
+			if (can_i_speak(channel, user))
 			{
 				for (unsigned long i = 2; i < out.size(); i++)
 					msg += " " + out[i];
@@ -125,7 +138,7 @@ void	ExecutionManager::command_privmsg(std::vector<std::string> out, Client *use
 			user->answer += ERR_NOSUCHCHANNEL(channel_name);
 		else
 		{
-			if ((channel->is_moderated() && channel->is_voice_ok(user)) || !channel->is_moderated())
+			if (can_i_speak(channel, user))
 			{
 				for (unsigned long i = 2; i < out.size(); i++)
 					msg += " " + out[i];
