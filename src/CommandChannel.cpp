@@ -207,6 +207,9 @@ void	ExecutionManager::remove_client_of_channel(Channel *channel, Client *client
 		if (ite->get_nickname() == client->get_nickname())
 			break ;
 	channel->_clients->erase(channel->_clients->begin() + i);
+	channel->remove_invited(client);
+	channel->remove_voice_ok(client);
+	channel->remove_operator(client);
 	//supprimer le channel si 0 clients
 	if (channel->_clients->empty())
 		delete_channel(channel);
@@ -271,8 +274,9 @@ void	ExecutionManager::command_kick(std::vector<std::string> out, Client *client
 								kick_msg = out[3];
 							else
 								kick_msg = "";
+							send_msg_to_all_clients_of_channel(MSG_KICK(client->get_nickname(), channel->get_name(), clientToKick->get_nickname(), kick_msg), client, channel);
+							send_channel_client_list(channel);
 							clientToKick->answer += MSG_KICK(client->get_nickname(), channel->get_name(), clientToKick->get_nickname(), kick_msg);
-							client->answer += MSG_KICK(client->get_nickname(), channel->get_name(), clientToKick->get_nickname(), kick_msg);
 						}
 						else
 							client->answer += ERR_USERNOTINCHANNEL(user_names.at(j), channel->get_name());
