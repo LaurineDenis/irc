@@ -76,7 +76,7 @@ void	ExecutionManager::command_pass(std::vector<std::string> out, Client *user)
 
 void	ExecutionManager::command_notice(std::vector<std::string> out, Client *user)
 {
-	std::cout << "command Privmsg" << std::endl;
+	std::cout << "command Notice" << std::endl;
 	Channel		*channel;
 	Client		*other_user;
 	std::string	channel_name;

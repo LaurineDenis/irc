@@ -38,7 +38,7 @@ void	ExecutionManager::command_topic(std::vector<std::string> out, Client *clien
 					client->answer += ERR_NEEDMOREPARAMS(out.at(0));
 				else
 				{
-					if (channel->is_mode_topic() && channel->is_operator(client))
+					if ((channel->is_mode_topic() && channel->is_operator(client)) || !channel->is_mode_topic())
 					{
 						change_topic(out[2].erase(0, 1), client->get_nickname(), channel);
 						send_msg_to_all_clients_of_channel(RPL_TOPIC(client->get_nickname(), channel->get_name(), channel->get_topic()), client, channel);
@@ -73,14 +73,12 @@ std::vector<std::string>	ExecutionManager::parse_channel_name(std::vector<std::s
 		{
 			client->answer += ERR_NOSUCHCHANNEL(names.at(i));
 			names.erase(names.begin() + i);
-			// ERROR not a channel name
 		}
 		else 
 		{
 			s.erase(0, 1);
-			if (s.find_first_of(" \7") != std::string::npos)
+			if (s.size() && s.find_first_of(" \a") != std::string::npos)
 				names.erase(names.begin() + i);
-
 		}
 	}
 	return names;

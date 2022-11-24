@@ -9,4 +9,6 @@ int main(int ac, char **av)
 	server->start(exec);
 	exec->init(server);
 	server->run(exec);
+	/* delete server; */
+	/* delete exec; */
 }

@@ -10,11 +10,9 @@ void	ExecutionManager::command_ping(std::vector<std::string> out, Client *client
 	std::string		token;
 
 	if (out.size() != 2)
-	{
-		//ERRROR
-	}
+		client->answer += ERR_NEEDMOREPARAMS(out.at(0));
 	else 
-		client->answer = "PONG server " + out.at(1);
+		client->answer += "PONG server " + out.at(1) + ENDLINE;
 }
 
 void	ExecutionManager::command_nick(std::vector<std::string> out, Client *client)
@@ -96,6 +94,8 @@ void	ExecutionManager::command_client(std::vector<std::string> out, Client *clie
 			client->_del = 1;
 		}
 	}
+	else 
+		client->answer += ERR_ALREADYREGISTRED;
 }
 
 void	ExecutionManager::command_quit(Client *client, int index)

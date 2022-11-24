@@ -184,6 +184,7 @@ void		ExecutionManager::shutdown()
 	_channels->clear();
 	close(_clientSd.at(0).fd);
 	_clientSd.clear();
+	exit (EXIT_SUCCESS);
 }
 
 void		ExecutionManager::sendRpl()
