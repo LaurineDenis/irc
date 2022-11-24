@@ -88,6 +88,7 @@ class	ExecutionManager {
 		void	send_msg_to_all_clients_of_channel(std::string msg, Client *client, Channel *channel);
 		void	send_msg_to_channel_clients(std::string msg, Client *client, Channel *channel);
 		void	send_msg_to_client(std::string msg, Client *client);
+		void	send_channel_client_list(Channel *channel)
 		void	print_infos();
 		Client	*find_client(std::string nickname);
 		Channel	*find_channel(std::string channel_name);

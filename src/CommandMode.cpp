@@ -131,6 +131,15 @@ void	ExecutionManager::mode_moderated(Client *client, Channel *channel, std::vec
 	}
 }
 
+void	ExecutionManager::send_channel_client_list(Channel *channel)
+{
+	for (unsigned long i = 0; i < _clients->size(); i++)
+	{
+		if(is_in_channel(channel, &_clients->at(i)))
+			send_list_name_channel(&_clients->at(i), channel);
+	}
+}
+
 void	ExecutionManager::mode_operator(Client *client, Channel *channel, std::vector<std::string> line)
 {
 	std::cout << "Mode Operator" << std::endl;
